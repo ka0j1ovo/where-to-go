@@ -200,7 +200,7 @@
       if (!c) return;
       var card = document.createElement("div");
       card.className = "compare-city-card";
-      card.innerHTML = window.cityCardBodyHtml(c);
+      card.innerHTML = window.cityBaiduButtonHtml(c) + window.cityCardBodyHtml(c);
       grid.appendChild(card);
     });
     el.appendChild(grid);

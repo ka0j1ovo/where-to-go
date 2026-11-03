@@ -152,6 +152,13 @@
     return btn;
   };
 
+  // 城市卡片右上角的百度搜索按钮（图标 + 文字）
+  window.cityBaiduButtonHtml = function (c) {
+    var url = "https://www.baidu.com/s?wd=" + encodeURIComponent(c.name + " 景点");
+    return '<a class="popover-baidu" href="' + url + '" target="_blank" rel="noopener" title="百度搜索「' +
+      window.escHtml(c.name) + ' 景点」">🔎 百度搜索</a>';
+  };
+
   // 城市卡片主体（弹层与对比页共用）
   window.cityCardBodyHtml = function (c) {
     var dimsHtml = (window.CITY_DIMS || []).map(function (d) {
@@ -160,7 +167,6 @@
         window.cityDimScoreHtml(d, c) +
       '</div>';
     }).join("");
-    var baiduUrl = "https://www.baidu.com/s?wd=" + encodeURIComponent(c.name + " 景点");
     var funStars = c.fun != null ? "★".repeat(Math.max(1, c.fun)) : "—";
 
     return '<div class="popover-head">' +
@@ -174,9 +180,6 @@
         '<span>站长体验 ' + funStars + '</span>' +
       '</div>' +
       '<div class="popover-dims">' + dimsHtml + '</div>' +
-      '<a class="popover-baidu-link" href="' + baiduUrl + '" target="_blank" rel="noopener">' +
-        '🔎 百度搜索「' + window.escHtml(c.name) + ' 景点」' +
-      '</a>' +
       '<div class="popover-notes">' + window.escHtml(c.notes || "暂无备注。") + '</div>' +
       '<div class="popover-tags">' + window.cityAllTags(c).map(function (t) {
         return '<span class="tag cat-' + (TAG_CATEGORY[t] || "none") + '">' + window.escHtml(t) + '</span>';
@@ -190,16 +193,13 @@
     var old = document.getElementById("city-popover");
     if (old) old.remove();
 
-    var baiduUrl = "https://www.baidu.com/s?wd=" + encodeURIComponent(name + " 景点");
-
     var overlay = document.createElement("div");
     overlay.id = "city-popover";
     overlay.className = "popover-overlay";
     overlay.innerHTML =
       '<div class="popover">' +
         '<button class="popover-close" type="button" aria-label="关闭">×</button>' +
-        '<a class="popover-baidu" href="' + baiduUrl + '" target="_blank" rel="noopener" title="百度搜索：' +
-          window.escHtml(name) + ' 景点">🔎</a>' +
+        window.cityBaiduButtonHtml(c) +
         window.cityCardBodyHtml(c) +
         '<div class="popover-actions"></div>' +
       '</div>';

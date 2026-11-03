@@ -949,16 +949,23 @@ input[type="range"]::-moz-range-thumb {
 .popover-dim-name { color: #4b5563; }
 .popover-dim .score-view { color: var(--accent); }
 
-/* 城市卡片右上角：百度搜索 */
+/* 城市卡片右上角：百度搜索（图标 + 文字） */
 .popover-baidu {
-  position: absolute; top: 10px; right: 44px;
-  width: 30px; height: 30px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 15px; text-decoration: none;
-  background: #f2f2f4;
-  transition: background .15s ease;
+  position: absolute; top: 12px; right: 46px;
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 5px 12px; border-radius: 999px;
+  font-size: 12.5px; font-weight: 600; line-height: 1.4;
+  color: var(--accent); background: var(--accent-soft);
+  text-decoration: none; white-space: nowrap;
+  transition: filter .15s ease;
 }
-.popover-baidu:hover { background: var(--accent-soft); }
+.popover-baidu:hover { filter: brightness(.96); }
+/* 给右上角按钮留出空间，避免与城市名重叠 */
+.popover-head { padding-right: 132px; }
+.popover-city { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 对比页卡片也需要容纳右上角按钮 */
+.compare-city-card { position: relative; }
 
 /* 分享图片弹层 */
 .share-image-box {
@@ -1024,18 +1031,6 @@ input[type="range"]::-moz-range-thumb {
 .score-bar i { display: block; width: 5px; height: 10px; border-radius: 2px; background: #e5e5ea; }
 .score-bar i.on { background: currentColor; opacity: .9; }
 .result-reason-body .score-view { color: var(--accent); }
-
-/* 城市卡片内的百度搜索引导 */
-.popover-baidu-link {
-  display: inline-block;
-  margin-bottom: 14px;
-  font-size: 13px; font-weight: 600;
-  color: var(--accent); text-decoration: none;
-  background: var(--accent-soft);
-  padding: 8px 14px; border-radius: 999px;
-  transition: filter .15s ease;
-}
-.popover-baidu-link:hover { filter: brightness(.96); }
 
 /* 对比页：搜索选城 */
 .compare-search-box { position: relative; }

@@ -3,56 +3,119 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>旅行城市推荐器</title>
+  <title>旅·问 · where-to-go</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1>旅行城市推荐器</h1>
-  </header>
-
-  <main>
-    <aside class="sidebar">
-      <section class="bento">
-        <div class="bento-title">我想看到的景色</div>
-        <div id="types"></div>
-      </section>
-
-      <section class="bento">
-        <div class="bento-title">我的行程</div>
-        <div id="trip"></div>
-      </section>
-
-      <section class="bento">
-        <div class="bento-title">我的旅行喜好</div>
-        <div id="prefs"></div>
-      </section>
-
-      <section class="bento">
-        <div class="bento-title">我想征求建议</div>
-        <div id="author"></div>
-      </section>
-
-      <button id="reset" class="reset">重置所有设置</button>
-    </aside>
-
-    <div class="right-col">
-      <div class="map-col">
-        <div id="china-map"></div>
-      </div>
-
-      <section class="results-panel">
-        <div id="summary" class="summary"></div>
-        <div id="jumpmode" class="jumpmode"></div>
-        <div id="results" class="results"></div>
-      </section>
+  <nav class="topbar">
+    <a class="brand" href="index.html">旅<span class="brand-dot">·</span>问<span class="brand-sub">where-to-go</span></a>
+    <div class="navlinks">
+      <a class="navlink active" href="index.html">首页</a>
+      <a class="navlink" href="test.html">天选之城测试</a>
+      <a class="navlink" href="recommender.html">旅游城市推荐器</a>
+      <a class="navlink" href="compare.html">城市对比</a>
     </div>
+  </nav>
+
+  <main class="home">
+    <section class="hero">
+      <h1><span class="hero-hl">去哪</span>，让 旅·问 帮你问一问</h1>
+      <p class="hero-sub">100 座城市的真实旅行数据，换个方式找到属于你的那一座。</p>
+    </section>
+
+    <!-- 搜索 -->
+    <section class="home-section search-section">
+      <div class="search-box">
+        <input id="search-input" class="search-input" type="text" autocomplete="off"
+               placeholder="搜索城市 / 省份 / 标签，比如「海」「西安」「四川」">
+        <div id="search-results" class="search-results"></div>
+      </div>
+    </section>
+
+    <!-- 新手引导：三个入口 -->
+    <section class="home-cards">
+      <a class="home-card" href="test.html">
+        <h2>天选之城测试</h2>
+        <p class="home-card-desc">约 25 道生活场景题，测出你的命定目的地</p>
+        <ul class="home-card-points">
+          <li>不用想条件，跟着感觉选就好</li>
+          <li>约 3 分钟出结果</li>
+          <li>逐条解释为什么是这座城</li>
+        </ul>
+        <span class="home-card-cta">开始测试 →</span>
+      </a>
+
+      <a class="home-card" href="recommender.html">
+        <h2>旅游城市推荐器</h2>
+        <p class="home-card-desc">8 个维度，自己说了算</p>
+        <ul class="home-card-points">
+          <li>口味、预算、体力都能自己调</li>
+          <li>地图上直接看全国分布</li>
+          <li>硬性条件精确筛选</li>
+        </ul>
+        <span class="home-card-cta">打开推荐器 →</span>
+      </a>
+
+      <a class="home-card" href="compare.html">
+        <h2>城市对比</h2>
+        <p class="home-card-desc">两座城市，并排看个明白</p>
+        <ul class="home-card-points">
+          <li>7 个维度直接对比</li>
+          <li>雷达图叠加更直观</li>
+          <li>做最后决定时用</li>
+        </ul>
+        <span class="home-card-cta">去对比 →</span>
+      </a>
+    </section>
+
+    <!-- 随机旅行 -->
+    <section class="home-section draw-section">
+      <div class="home-section-head">
+        <h2>随机旅行</h2>
+        <p>每天抽一次</p>
+      </div>
+      <div class="draw-stage">
+        <div class="draw-glow"></div>
+        <div class="draw-card" id="draw-card">
+          <div class="draw-card-inner" id="draw-card-inner">
+            <div class="draw-face draw-back">
+              <div class="draw-back-logo">✦</div>
+              <div class="draw-back-text">旅·问</div>
+            </div>
+            <div class="draw-face draw-front">
+              <div class="draw-prov" id="draw-prov"></div>
+              <div class="draw-city" id="draw-city"></div>
+              <div class="draw-tags" id="draw-tags"></div>
+              <div class="draw-note" id="draw-note"></div>
+            </div>
+          </div>
+        </div>
+        <div class="draw-sparkles" id="draw-sparkles"></div>
+      </div>
+      <div class="draw-actions">
+        <button id="draw-btn" class="draw-btn" type="button" disabled>抽一次 ✦</button>
+      </div>
+    </section>
+
+    <!-- 文字云：城市总览 -->
+    <section class="home-section cloud-section">
+      <div class="home-section-head">
+        <h2>城市总览</h2>
+      </div>
+      <div id="wordcloud" class="wordcloud"></div>
+    </section>
+
+    <!-- 心愿单 -->
+    <section class="home-section fav-section" id="fav-section" style="display:none">
+      <div class="home-section-head">
+        <h2>我想去的地方</h2>
+      </div>
+      <div id="fav-list" class="fav-list"></div>
+    </section>
   </main>
 
   <script src="data.js"></script>
-  <script src="echarts.min.js"></script>
-  <script src="china.js"></script>
-  <script src="geo.js"></script>
-  <script src="app.js"></script>
+  <script src="common.js"></script>
+  <script src="home.js"></script>
 </body>
 </html>

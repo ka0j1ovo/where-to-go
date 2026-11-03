@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>城市对比 · 旅·问</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="topbar">
+    <a class="brand" href="index.html">旅<span class="brand-dot">·</span>问<span class="brand-sub">where-to-go</span></a>
+    <div class="navlinks">
+      <a class="navlink" href="index.html">首页</a>
+      <a class="navlink" href="test.html">天选之城测试</a>
+      <a class="navlink" href="recommender.html">旅游城市推荐器</a>
+      <a class="navlink active" href="compare.html">城市对比</a>
+    </div>
+  </nav>
+
+  <main class="compare-main">
+    <section class="compare-head">
+      <h1>两座城市，并排看看</h1>
+      <p>从 7 个维度直接对比，帮你做最后的决定。</p>
+    </section>
+
+    <section class="compare-selectors">
+      <div class="compare-pick">
+        <label for="cmp-a">城市 A</label>
+        <div class="compare-pick-row">
+          <select id="cmp-a" class="compare-select"></select>
+          <span id="fav-a" class="fav-slot"></span>
+        </div>
+      </div>
+      <div class="compare-vs">VS</div>
+      <div class="compare-pick">
+        <label for="cmp-b">城市 B</label>
+        <div class="compare-pick-row">
+          <select id="cmp-b" class="compare-select"></select>
+          <span id="fav-b" class="fav-slot"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="compare-radar-card">
+      <div id="compare-radar" class="compare-radar"></div>
+    </section>
+
+    <section class="compare-table-card">
+      <div class="compare-table" id="compare-table"></div>
+    </section>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="echarts.min.js"></script>
+  <script src="common.js"></script>
+  <script src="compare.js"></script>
+</body>
+</html>

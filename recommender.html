@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>旅游城市推荐器 · 旅·问</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="topbar">
+    <a class="brand" href="index.html">旅<span class="brand-dot">·</span>问<span class="brand-sub">where-to-go</span></a>
+    <div class="navlinks">
+      <a class="navlink" href="index.html">首页</a>
+      <a class="navlink" href="test.html">天选之城测试</a>
+      <a class="navlink active" href="recommender.html">旅游城市推荐器</a>
+      <a class="navlink" href="compare.html">城市对比</a>
+    </div>
+  </nav>
+
+  <main>
+    <aside class="sidebar">
+      <section class="bento">
+        <div class="bento-title">我想看到的景色</div>
+        <div id="types"></div>
+      </section>
+
+      <section class="bento">
+        <div class="bento-title">我的行程</div>
+        <div id="trip"></div>
+      </section>
+
+      <section class="bento">
+        <div class="bento-title">我的旅行喜好</div>
+        <div id="prefs"></div>
+      </section>
+
+      <section class="bento">
+        <div class="bento-title">我想征求建议</div>
+        <div id="author"></div>
+      </section>
+
+      <button id="reset" class="reset">重置所有设置</button>
+    </aside>
+
+    <div class="right-col">
+      <div class="map-col">
+        <div id="china-map"></div>
+      </div>
+
+      <section class="results-panel">
+        <div id="summary" class="summary"></div>
+        <div id="notice" class="notice" style="display:none"></div>
+        <div id="results" class="results"></div>
+      </section>
+    </div>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="echarts.min.js"></script>
+  <script src="common.js"></script>
+  <script src="china.js"></script>
+  <script src="geo.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

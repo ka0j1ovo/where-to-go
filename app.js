@@ -22,7 +22,7 @@ var TAG_GROUPS = [
   { key: "water",    label: "水",   emoji: "🌊", tags: ["江河湖", "盐湖海子", "海", "瀑布"] },
   { key: "wild",     label: "原野", emoji: "🌲", tags: ["草原", "沙漠", "湿地", "森林", "峡谷", "溶洞"] },
   { key: "culture",  label: "人文", emoji: "🏛️", tags: ["佛教", "古城古建", "红色", "园林", "水乡古镇", "文物遗迹", "民俗"] },
-  { key: "urban",    label: "都市", emoji: "🌃", tags: ["夜景", "都市潮流", "赌场"] }
+  { key: "urban",    label: "都市", emoji: "🌃", tags: ["夜景", "都市潮流", "赌场", "主题乐园"] }
 ];
 var TAG_CATEGORY = {};
 TAG_GROUPS.forEach(function (g) {
@@ -58,13 +58,6 @@ var DAY_STOPS = [
   { label: "不限", value: null }
 ];
 
-// —— 点击卡片跳转 ——
-var JUMP_OPTIONS = [
-  { label: "不跳转", value: "none" },
-  { label: "跳转百度（电脑推荐）", value: "baidu" }
-];
-var jumpMode = "none";
-
 // —— 软性维度 ——
 function natureMix(c) {
   var culture = (c.culture === undefined ? 0 : c.culture);
@@ -74,11 +67,14 @@ function natureMix(c) {
 }
 
 var DIMENSIONS = [
-  { key: "scenery", label: "我更倾向[人文景点]还是[自然景点]？", short: "人文/自然", left: "人文景点", right: "自然景点", scale: 5, levels: 5, get: function (c) { return natureMix(c); } },
-  { key: "food", label: "我很在乎[美食]？", short: "美食", left: "没啥吃的", right: "遍地珍馐", scale: 5, levels: 5, get: function (c) { return c.food; } },
-  { key: "popularity", label: "我喜欢[大众热门都市]还是[小众冷门小城]？", short: "大众/小众", left: "大众热门都市", right: "小众冷门小城", reversed: true, scale: 5, levels: 5, get: function (c) { return c.popularity; } },
-  { key: "cost", label: "我去的地方[消费水平]是？", short: "消费", left: "高性价比", right: "奢华沪币", scale: 5, levels: 5, get: function (c) { return c.cost; } },
-  { key: "fun", label: "我想参考[主播的游玩评价]？", short: "主播评价", left: "主播觉得不好玩", right: "主播觉得好玩", scale: 5, levels: 5, section: "author", weightLevels: AUTHOR_WEIGHT_LEVELS, get: function (c) { return c.fun; } }
+  { key: "scenery", label: "我更倾向[人文景点]还是[自然景点]？", short: "人文/自然", left: "人文景点", right: "自然景点", scale: 5, levels: 5, opinions: ["只看人文", "多人文少自然", "有人文有自然", "多自然少人文", "只看自然"], get: function (c) { return natureMix(c); } },
+  { key: "food", label: "我很在乎[美食]？", short: "美食", left: "没啥吃的", right: "遍地珍馐", scale: 5, levels: 5, opinions: ["美食荒漠", "吃的偏少", "美食不突出的城市", "可以找到特色美食", "遍地珍馐"], get: function (c) { return c.food; } },
+  { key: "popularity", label: "我喜欢[大众热门都市]还是[小众冷门小城]？", short: "大众/小众", left: "大众热门都市", right: "小众冷门小城", reversed: true, scale: 5, levels: 5, opinions: ["大众热门城市", "著名旅游城市", "有景区的旅游城市", "游客稀少的城市", "只有当地人的小众宝藏城市"], get: function (c) { return c.popularity; } },
+  { key: "cost", label: "我去的地方[消费水平]是？", short: "消费", left: "高性价比", right: "奢华沪币", scale: 5, levels: 5, opinions: ["物价像回到千禧年", "物价便宜双爽花", "不低不高", "物价有点小高但正常合理的旅游城市", "奢华沪币"], get: function (c) { return c.cost; } },
+  { key: "leisure", label: "我这次想去[悠然自得的地方放松身心]，还是打算去[消耗精力挑战自我]？", short: "轻松/劳累", left: "轻松休闲", right: "劳累辛苦", scale: 5, levels: 5, opinions: ["松弛休闲慢节奏城市", "旅游时花一点点小精力", "旅游正常劳累程度", "去这里需要花费一定精力", "劳累有挑战！"], get: function (c) { return c.leisure === undefined ? 3 : c.leisure; } },
+  { key: "stay", label: "我希望去一个景点[能支撑长时间停留]的城市，而不是去多个[短时间、快速逛完]的城市。", short: "停留时间", left: "宜久留景点多", right: "快速打卡景点少", reversed: true, scale: 5, levels: 5, opinions: ["一个城市竟然能待一周？", "可以玩三四天", "刚刚好", "停留一两天的地方", "路过这个地方来打个卡，很快就能逛完"], get: function (c) { return c.stay === undefined ? 3 : c.stay; } },
+  { key: "photo", label: "我希望去一个[容易出片]的城市。", short: "出片度", left: "好处片的地方", right: "远离能出片的地方", reversed: true, scale: 5, levels: 5, opinions: ["随手一拍都是大片", "景色很容易出片", "可以拍出旅游照", "只适合记录日常", "完全不用打开相机"], get: function (c) { return c.photo === undefined ? 3 : c.photo; } },
+  { key: "fun", label: "我想参考[站长的游玩体验]？", short: "站长体验", left: "站长体验差", right: "站长体验好", scale: 5, levels: 5, section: "author", weightLevels: AUTHOR_WEIGHT_LEVELS, opinions: ["根本没啥玩的", "有玩但也就那样，专程去一趟挺普通", "有特色的旅游城市", "很值得一去的地方", "特别好玩的地方"], get: function (c) { return c.fun; } }
 ];
 
 // —— 工具 ——
@@ -210,6 +206,19 @@ function hasAny(arr, sel) {
 function cityHasTag(c) {
   return hasAny(cityAllTags(c), filters.tags);
 }
+// 至少选择这么多个维度，才认为结果可信
+var MIN_ACTIVE_DIMS = 3;
+function activeDimCount() {
+  var n = 0;
+  DIMENSIONS.forEach(function (d) { if (prefs[d.key].weight > 0) n++; });
+  return n;
+}
+// 高匹配提示阈值（百分比）
+var LOW_MATCH_THRESHOLD = 75;
+var PERFECT_MATCH_THRESHOLD = 92;
+// 分数浮点误差容差：小于该差值视为同分
+var SCORE_EPSILON = 1e-6;
+
 function scoreCity(city) {
   var sum = 0, totalW = 0;
   var detail = {};
@@ -612,13 +621,14 @@ function makeTransitControl() {
 function makeDimRow(d) {
   var wrap = document.createElement("div");
   wrap.className = "dim";
+  wrap.setAttribute("data-dim", d.key);
 
   var label = document.createElement("div");
   label.className = "dim-label";
   label.innerHTML = hl(d.label);
   var badge = document.createElement("span");
   badge.className = "dim-badge";
-  badge.textContent = "着重";
+  badge.textContent = "着重考虑";
   label.appendChild(badge);
   wrap.appendChild(label);
 
@@ -634,8 +644,15 @@ function makeDimRow(d) {
       badge.style.display = "none";
     } else {
       control.style.display = "";
-      if (w === 3) { control.classList.add("important"); badge.style.display = ""; }
-      else { control.classList.remove("important"); badge.style.display = "none"; }
+      if (w === 3) {
+        control.classList.add("important");
+        wrap.classList.add("dim-focus");
+        badge.style.display = "";
+      } else {
+        control.classList.remove("important");
+        wrap.classList.remove("dim-focus");
+        badge.style.display = "none";
+      }
     }
   }
 
@@ -667,6 +684,18 @@ function makeDimRow(d) {
     body.appendChild(slider);
     body.appendChild(right);
     control.appendChild(body);
+
+    // 五个档位对应的说明文字
+    var opinions = d.opinions || [];
+    var opinion = document.createElement("div");
+    opinion.className = "dim-opinion";
+    function applyOpinion() {
+      var text = opinions[prefs[d.key].want] || "";
+      opinion.textContent = text;
+      opinion.style.display = text ? "" : "none";
+    }
+    applyOpinion();
+    control.appendChild(opinion);
   }
   wrap.appendChild(control);
 
@@ -679,6 +708,23 @@ function makeDimRow(d) {
 
   applyWeight();
   return wrap;
+}
+
+// 同步所有维度的「当前档位说明文字」——滑条拖动后由 render() 调用
+function syncOpinions() {
+  var rows = document.querySelectorAll("#prefs .dim, #author .dim");
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i];
+    var key = row.getAttribute("data-dim");
+    var d = null;
+    for (var j = 0; j < DIMENSIONS.length; j++) if (DIMENSIONS[j].key === key) { d = DIMENSIONS[j]; break; }
+    if (!d || !d.opinions) continue;
+    var el = row.querySelector(".dim-opinion");
+    if (!el) continue;
+    var text = d.opinions[prefs[key].want] || "";
+    el.textContent = text;
+    el.style.display = text ? "" : "none";
+  }
 }
 
 // —— 组装左侧面板 ——
@@ -735,6 +781,7 @@ function ringCityList() {
   var list = [];
   if (!dep) return list;
   data.forEach(function (c) {
+    if (!passesHardFilters(c)) return;   // 被硬性条件排除的城市不在图上显示
     var coord = cityCoord(c);
     if (!coord) return;
     var d = haversine(dep.lat, dep.lng, coord.lat, coord.lng);
@@ -748,12 +795,15 @@ function ringCityList() {
 function refreshMap(scored) {
   if (!chinaChart) return;
   var dep = currentDeparture();
-  var ring = ringCityList();
+  // 维度不足时 scored 为 null/空 -> 地图上不显示任何城市蓝点
+  var showCities = !!(scored && scored.length);
+  var ring = showCities ? ringCityList() : [];
   var ringNames = {};
   ring.forEach(function (r) { ringNames[r.name] = true; });
 
   var top3Names = {};
-  if (scored) {
+  if (scored && scored.length) {
+    // 只在真正展示的结果里取 Top3；scored 为空则只有普通小蓝点
     var count = 0;
     for (var i = 0; i < scored.length && count < 3; i++) {
       var n = scored[i].city.name;
@@ -929,64 +979,73 @@ function makeCard(item, i, hasPref, dep) {
 function render() {
   var summary = document.getElementById("summary");
   var results = document.getElementById("results");
+  var notice = document.getElementById("notice");
   var data = window.CITY_DATA || [];
   var dep = currentDeparture();
 
-  var hasPref = DIMENSIONS.some(function (d) { return prefs[d.key].weight > 0; }) || tagPrefActive();
+  // 左侧面板不重建，但档位说明文字需要跟着滑条更新
+  syncOpinions();
+
+  // 只统计维度；soft 模式下的 tag 不算作一个维度
+  var activeCount = activeDimCount();
+  var enoughDims = activeCount >= MIN_ACTIVE_DIMS;
 
   var included = data.filter(function (c) { return passesHardFilters(c); });
   var excludedCount = data.length - included.length;
 
-  var scored;
-  if (hasPref) {
-    scored = included.map(function (c) {
-      var s = scoreCity(c);
-      return { city: c, score: s.score, detail: s.detail };
-    }).sort(function (a, b) {
-      return (b.score == null ? -1 : b.score) - (a.score == null ? -1 : a.score);
-    });
-  } else {
-    scored = included.map(function (c) { return { city: c, score: null, detail: {} }; })
-      .sort(function (a, b) { return a.city.name.localeCompare(b.city.name, "zh"); });
+  notice.textContent = "";
+  notice.className = "notice";
+  notice.style.display = "none";
+
+  // 维度不够时不出结果、不画蓝点
+  if (!enoughDims) {
+    summary.textContent = "共匹配 " + included.length + " 座城市" +
+      (excludedCount ? " · 已排除 " + excludedCount + " 座" : "");
+    results.innerHTML = '<div class="empty">筛选的维度较少，不能给出准确的结果，再增加几个维度吧 :)</div>';
+    refreshMap([]);
+    return;
   }
 
-  var names = [];
-  DIMENSIONS.forEach(function (d) { if (prefs[d.key].weight > 0) names.push(d.short || d.label); });
-  if (tagPrefActive()) names.push("景点类型");
-  var dimNames = names.length ? names.join("、") : "（未设置偏好，按名称排序）";
+  var scored = included.map(function (c) {
+    var s = scoreCity(c);
+    return { city: c, score: s.score, detail: s.detail };
+  }).sort(function (a, b) {
+    var sa = a.score == null ? -1 : a.score;
+    var sb = b.score == null ? -1 : b.score;
+    // 浮点误差内的分数视为同分，再按出行距离升序
+    if (Math.abs(sa - sb) > SCORE_EPSILON) return sb - sa;
+    return distanceRank(a.city, dep) - distanceRank(b.city, dep);
+  });
 
-  var depText = dep ? " · 出发地 " + dep.name : "";
   summary.textContent = "共匹配 " + scored.length + " 座城市" +
-    (excludedCount ? " · 已排除 " + excludedCount + " 座（硬性条件）" : "") +
-    depText +
-    " · 维度：" + dimNames;
+    (excludedCount ? " · 已排除 " + excludedCount + " 座" : "");
 
   results.innerHTML = "";
   if (scored.length === 0) {
     results.innerHTML = '<div class="empty">没有符合条件的城市，试试放宽硬性条件（景色 tag / 出行距离 / 旅行天数 / 交通方式）。</div>';
   } else {
-    scored.forEach(function (item, i) { results.appendChild(makeCard(item, i, hasPref, dep)); });
+    scored.forEach(function (item, i) { results.appendChild(makeCard(item, i, true, dep)); });
+
+    // 结果提示：天选城市 / 高匹配偏少
+    var best = scored[0].score;
+    if (best != null && best > PERFECT_MATCH_THRESHOLD) {
+      notice.textContent = "简直是你的天选城市！";
+      notice.classList.add("notice-perfect");
+      notice.style.display = "";
+    } else if (!scored.some(function (it) { return it.score != null && it.score > LOW_MATCH_THRESHOLD; })) {
+      notice.textContent = "筛选后高匹配度城市较少，有些不在意的维度可以选择无所谓哦 :)";
+      notice.classList.add("notice-sparse");
+      notice.style.display = "";
+    }
   }
 
   refreshMap(scored);
 }
 
-// —— 点击卡片跳转搜索 ——
-function jumpToSearch(name) {
-  if (jumpMode === "baidu") {
-    window.open("https://www.baidu.com/s?wd=" + encodeURIComponent(name + " 景点"), "_blank");
-  }
-}
-
-function buildJumpControl() {
-  var el = document.getElementById("jumpmode");
-  if (!el) return;
-  el.innerHTML = "";
-  var lb = document.createElement("span");
-  lb.className = "jumpmode-label";
-  lb.textContent = "点击卡片后：";
-  el.appendChild(lb);
-  el.appendChild(makeSegmented(JUMP_OPTIONS, jumpMode, function (v) { jumpMode = v; }));
+// —— 同分时按出行距离排序：无法定位的城市排最后 ——
+function distanceRank(city, dep) {
+  var d = cityDistanceKm(city, dep);
+  return d == null ? Infinity : d;
 }
 
 // —— 初始化 ——
@@ -1006,7 +1065,6 @@ window.addEventListener("resize", function () {
 
 buildAreaLookup();
 buildControls();
-buildJumpControl();
 initChinaMap();
 render();
 
@@ -1015,7 +1073,9 @@ document.getElementById("results").addEventListener("click", function (e) {
   while (node && node.classList) {
     if (node.classList.contains("card")) {
       var name = node.getAttribute("data-city");
-      if (name) jumpToSearch(name);
+      if (name) {
+        if (window.showCityPopover) window.showCityPopover(name);
+      }
       return;
     }
     node = node.parentNode;

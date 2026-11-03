@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>天选之城测试 · 旅·问</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="topbar">
+    <a class="brand" href="index.html">旅<span class="brand-dot">·</span>问<span class="brand-sub">where-to-go</span></a>
+    <div class="navlinks">
+      <a class="navlink" href="index.html">首页</a>
+      <a class="navlink active" href="test.html">天选之城测试</a>
+      <a class="navlink" href="recommender.html">旅游城市推荐器</a>
+      <a class="navlink" href="compare.html">城市对比</a>
+    </div>
+  </nav>
+
+  <main class="test-main">
+
+    <!-- ============ 测试视图 ============ -->
+    <section id="test-view" class="test-view">
+      <!-- 开场 -->
+      <div id="test-intro" class="test-intro">
+        <div class="test-intro-emoji">✦</div>
+        <h1>天选之城测试</h1>
+        <p class="test-intro-sub">不用想条件，跟着感觉选。<br>约 3 分钟，测出你的命定目的地。</p>
+        <ul class="test-intro-points">
+          <li>每次的题目都会随机组合，不太会重样</li>
+          <li>没有对错，选你最真实的反应</li>
+          <li>最后会告诉你「为什么是这座城」</li>
+        </ul>
+        <button id="start-test" class="test-btn-primary">开始测试</button>
+      </div>
+
+      <!-- 答题 -->
+      <div id="test-quiz" class="test-quiz" hidden>
+        <div class="test-progress">
+          <div class="test-progress-bar"><div id="test-progress-fill" class="test-progress-fill"></div></div>
+          <div class="test-progress-text"><span id="test-progress-cur">1</span>&thinsp;/&thinsp;<span id="test-progress-total">24</span></div>
+        </div>
+        <div class="test-scene" id="test-scene"></div>
+        <h2 class="test-question" id="test-question"></h2>
+        <div class="test-options" id="test-options"></div>
+        <div class="test-quiz-actions">
+          <button id="test-prev" class="test-btn-ghost" type="button">← 上一题</button>
+          <button id="test-next" class="test-btn-primary" type="button" disabled>下一题 →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 结果视图 ============ -->
+    <section id="result-view" class="result-view" hidden>
+      <div id="result-body"></div>
+    </section>
+
+  </main>
+
+  <script src="data.js"></script>
+  <script src="echarts.min.js"></script>
+  <script src="common.js"></script>
+  <script src="qrdata.js"></script>
+  <script src="share-image.js"></script>
+  <script src="test_data.js"></script>
+  <script src="test_templates.js"></script>
+  <script src="test.js"></script>
+</body>
+</html>

@@ -95,19 +95,27 @@
       var c = window.cityByName(name);
       var wrap = document.createElement("div");
       wrap.className = "compare-chosen-inner " + slot;
+
+      // 逐行显示：城市名 / 省份 / 收藏，避免挤成一行
       var label = document.createElement("span");
       label.className = "compare-chosen-name";
       label.textContent = name;
+      wrap.appendChild(label);
+
       if (c && c.province) {
         var pv = document.createElement("span");
         pv.className = "compare-chosen-prov";
         pv.textContent = c.province;
         wrap.appendChild(pv);
       }
-      wrap.insertBefore(label, wrap.firstChild);
 
-      // 收藏
-      if (window.favButton) wrap.appendChild(window.favButton(name, function () { renderChosen(); }));
+      // 收藏（单独一行）
+      if (window.favButton) {
+        var favRow = document.createElement("div");
+        favRow.className = "compare-chosen-fav";
+        favRow.appendChild(window.favButton(name, function () { renderChosen(); }));
+        wrap.appendChild(favRow);
+      }
 
       var clear = document.createElement("button");
       clear.type = "button";
@@ -125,19 +133,33 @@
     });
   }
 
+  var radarChart = null;
+
   function renderRadar() {
     var el = $("compare-radar");
     if (!el) return;
-    if (!window.echarts) { el.textContent = "图形组件未加载，已跳过雷达图。"; return; }
+
     var ca = window.cityByName(state.a), cb = window.cityByName(state.b);
+
+    // 缺城市：销毁图表并显示占位
     if (!ca || !cb) {
+      if (radarChart) { try { radarChart.dispose(); } catch (e) {} radarChart = null; }
       el.innerHTML = '<div class="compare-placeholder">选择两座城市后，这里会出现雷达图对比</div>';
       return;
     }
-    el.innerHTML = "";
-    var chart = window.echarts.getInstanceByDom(el) || window.echarts.init(el);
-    chart.resize();
-    chart.setOption({
+
+    if (!window.echarts) { el.textContent = "图形组件未加载，已跳过雷达图。"; return; }
+
+    // 首次才 init（清空占位），之后只更新 option，
+    // 不能清 innerHTML，否则会把 echarts 自己的画布删掉导致图表消失
+    if (!radarChart) {
+      el.innerHTML = "";
+      radarChart = window.echarts.init(el);
+      window.addEventListener("resize", function () {
+        if (radarChart) { try { radarChart.resize(); } catch (e) {} }
+      });
+    }
+    radarChart.setOption({
       tooltip: { trigger: "item" },
       legend: { bottom: 0, data: [ca.name, cb.name] },
       radar: {

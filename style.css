@@ -917,7 +917,7 @@ input[type="range"]::-moz-range-thumb {
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 .popover {
   position: relative;
-  width: 100%; max-width: 420px;
+  width: 100%; max-width: 500px;
   background: #fff; border-radius: 20px;
   padding: 24px; box-shadow: 0 24px 60px rgba(0,0,0,.3);
   animation: popover-in .22s cubic-bezier(.3,1.2,.4,1);
@@ -960,9 +960,12 @@ input[type="range"]::-moz-range-thumb {
   transition: filter .15s ease;
 }
 .popover-baidu:hover { filter: brightness(.96); }
-/* 给右上角按钮留出空间，避免与城市名重叠 */
-.popover-head { padding-right: 132px; }
-.popover-city { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* 给右上角按钮留出空间，避免与城市名重叠；标题可换行完整显示 */
+.popover-head { padding-right: 124px; }
+.popover-city {
+  white-space: normal; word-break: break-word;
+  font-size: 24px; font-weight: 800; line-height: 1.25;
+}
 
 /* 对比页卡片也需要容纳右上角按钮 */
 .compare-city-card { position: relative; }
@@ -1044,19 +1047,23 @@ input[type="range"]::-moz-range-thumb {
 }
 .compare-search:focus { border-color: var(--accent); }
 
-.compare-chosen { margin-top: 8px; min-height: 34px; }
+.compare-chosen { margin-top: 8px; }
 .compare-chosen-inner {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 6px 8px 6px 12px; border-radius: 999px;
+  position: relative;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+  padding: 12px 40px 12px 14px;
+  border-radius: 14px;
   background: var(--accent-soft); color: var(--accent);
-  font-size: 13px; font-weight: 600;
+  font-size: 14px; font-weight: 600;
 }
 .compare-chosen-inner.b { background: #fff2e0; color: #c76a00; }
-.compare-chosen-name { font-weight: 700; }
-.compare-chosen-prov { font-weight: 400; opacity: .8; font-size: 12px; }
+.compare-chosen-name { font-weight: 700; font-size: 16px; }
+.compare-chosen-prov { font-weight: 400; opacity: .8; font-size: 12.5px; }
+.compare-chosen-fav { margin-top: 2px; }
 .compare-chosen-clear {
+  position: absolute; top: 8px; right: 8px;
   border: none; background: rgba(0,0,0,.07); color: inherit;
-  width: 20px; height: 20px; border-radius: 50%;
+  width: 22px; height: 22px; border-radius: 50%;
   cursor: pointer; font-size: 13px; line-height: 1;
 }
 .compare-chosen-clear:hover { background: rgba(0,0,0,.14); }

@@ -1016,6 +1016,7 @@ function render() {
     summary.textContent = "共匹配 " + included.length + " 座城市" +
       (excludedCount ? " · 已排除 " + excludedCount + " 座" : "");
     results.innerHTML = '<div class="empty">筛选的维度较少，不能给出准确的结果，再增加几个维度吧 :)</div>';
+    updateShareBar([]);
     refreshMap([]);
     return;
   }
@@ -1061,6 +1062,16 @@ function render() {
   }
 
   refreshMap(shown);
+  updateShareBar(shown);
+}
+
+// —— 分享按钮：有结果时才显示 ——
+var lastShownCities = [];
+function updateShareBar(shown) {
+  lastShownCities = shown || [];
+  var bar = document.getElementById("share-bar");
+  if (!bar) return;
+  bar.style.display = lastShownCities.length ? "" : "none";
 }
 
 // —— 同分时按出行距离排序：无法定位的城市排最后 ——
@@ -1088,6 +1099,29 @@ buildAreaLookup();
 buildControls();
 initChinaMap();
 render();
+
+// —— 生成结果分享图 ——
+(function () {
+  var btn = document.getElementById("rec-share");
+  if (!btn) return;
+  btn.addEventListener("click", function () {
+    if (!lastShownCities.length) return;
+    if (!window.buildRecommenderImage) return;
+    var payload = {
+      count: lastShownCities.length,
+      cities: lastShownCities.map(function (x) {
+        return { name: x.city.name, province: x.city.province || "", score: x.score };
+      })
+    };
+    btn.disabled = true;
+    btn.textContent = "生成中…";
+    window.buildRecommenderImage(payload, function (url) {
+      btn.disabled = false;
+      btn.textContent = "生成分享图";
+      if (url && window.showShareImage) window.showShareImage(url, "旅问-城市推荐.png");
+    });
+  });
+})();
 
 document.getElementById("results").addEventListener("click", function (e) {
   var node = e.target;

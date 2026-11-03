@@ -197,7 +197,7 @@ main {
 .field-label { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
 
 /* 高亮 [] 框选词 */
-.hl { color: var(--accent); font-weight: 700; }
+.hl { color: var(--accent); font-weight: 700; margin: 0 2px; }
 
 /* 提示小字 */
 .hint { font-size: 11px; color: var(--muted); margin-top: 6px; line-height: 1.45; }
@@ -358,8 +358,14 @@ select {
 .dim + .dim { border-top: 1px solid #f2f2f4; }
 .dim:first-child { padding-top: 0; }
 .dim:last-child { padding-bottom: 0; }
-.dim-label { font-weight: 600; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
-.dim-badge { font-size: 10px; font-weight: 600; color: var(--warn); background: var(--warn-soft); border: 1px solid var(--warn-border); border-radius: 999px; padding: 1px 8px; }
+/* 维度标题：用正常文本流排版，避免 flex 把句子拆成多行 */
+.dim-label { font-weight: 600; margin-bottom: 10px; line-height: 1.6; }
+.dim-badge {
+  display: inline-block; margin-left: 6px; vertical-align: middle;
+  font-size: 10px; font-weight: 600; color: var(--warn);
+  background: var(--warn-soft); border: 1px solid var(--warn-border);
+  border-radius: 999px; padding: 1px 8px;
+}
 
 /* 「很重要」档：整个维度块浅黄色底高亮 */
 .dim.dim-focus {
@@ -436,6 +442,9 @@ input[type="range"]::-moz-range-thumb {
 }
 .reset:hover { opacity: .9; }
 .reset:active { transform: scale(.98); }
+
+/* 结果分享按钮 */
+.share-bar { display: flex; justify-content: center; margin-top: 16px; }
 
 /* 右侧结果 —— Bento 网格 */
 .results-panel { min-width: 0; }
@@ -991,7 +1000,8 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* ============ 城市对比页 ============ */
-.compare-main { max-width: 1720px; margin: 0 auto; padding: 40px 24px 72px; }
+/* 注意：必须覆盖通用 main 的 grid 双栏布局，否则子块会被塞进网格 */
+.compare-main { display: block; max-width: 1720px; margin: 0 auto; padding: 40px 24px 72px; }
 .compare-title {
   margin: 0 0 26px; text-align: center;
   font-size: 28px; font-weight: 700; letter-spacing: -.02em;
@@ -1007,13 +1017,14 @@ input[type="range"]::-moz-range-thumb {
 .compare-pick label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
 .compare-vs { font-size: 18px; font-weight: 800; color: var(--muted); padding-top: 26px; }
 
-/* 雷达图 + 对比表：并列 */
+/* 雷达图 + 对比表：并列，宽度与选城区一致 */
 .compare-panels {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 20px;
   align-items: start;
-  margin-bottom: 20px;
+  max-width: 1040px;
+  margin: 0 auto 20px;
 }
 
 .compare-radar-card {
@@ -1083,7 +1094,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* 对比页底部：城市卡片 */
-.compare-cards { margin: 0; max-width: none; }
+.compare-cards { max-width: 1040px; margin: 0 auto; }
 .compare-cards-grid {
   display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;
 }
@@ -1103,6 +1114,13 @@ input[type="range"]::-moz-range-thumb {
 /* 顶部导航移动端 */
 /* ============ 移动端 / 平板 ============ */
 @media (max-width: 900px) {
+  /* 推荐器：双栏 -> 单栏（否则右侧结果被挤压） */
+  main { grid-template-columns: 1fr; padding: 18px 16px 40px; }
+  header { padding: 24px 16px 0; }
+  #china-map { height: 340px; }
+  .endpoint { white-space: normal; }
+  .sidebar { gap: 14px; }
+
   .topbar { height: 54px; padding: 0 14px; gap: 8px; }
   .navlinks { gap: 2px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
   .navlinks::-webkit-scrollbar { display: none; }
@@ -1138,6 +1156,16 @@ input[type="range"]::-moz-range-thumb {
 
 /* ============ 手机（窄屏） ============ */
 @media (max-width: 600px) {
+  /* 推荐器 */
+  main { padding: 14px 12px 36px; }
+  #china-map { height: 260px; }
+  .card { padding: 15px; }
+  .card-top { gap: 10px; }
+  .name { font-size: 15px; }
+  .score { font-size: 21px; }
+  .fits { gap: 5px; }
+  .summary { font-size: 12.5px; }
+
   /* 首页 */
   .hero h1 { font-size: 22px; }
   .hero-sub { font-size: 13.5px; }

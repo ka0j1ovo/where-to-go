@@ -155,8 +155,7 @@
   // 城市卡片右上角的百度搜索按钮（图标 + 文字）
   window.cityBaiduButtonHtml = function (c) {
     var url = "https://www.baidu.com/s?wd=" + encodeURIComponent(c.name + " 景点");
-    return '<a class="popover-baidu" href="' + url + '" target="_blank" rel="noopener" title="百度搜索「' +
-      window.escHtml(c.name) + ' 景点」">🔎 百度搜索</a>';
+    return '<a class="popover-baidu" href="' + url + '" target="_blank" rel="noopener">🔎 百度搜索</a>';
   };
 
   // 城市卡片主体（弹层与对比页共用）

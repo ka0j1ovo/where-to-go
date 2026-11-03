@@ -966,6 +966,8 @@ input[type="range"]::-moz-range-thumb {
 
 /* 对比页卡片也需要容纳右上角按钮 */
 .compare-city-card { position: relative; }
+.compare-city-card .popover-baidu { right: 12px; }
+.compare-city-card .popover-head { padding-right: 118px; }
 
 /* 分享图片弹层 */
 .share-image-box {

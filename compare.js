@@ -204,7 +204,7 @@
     });
   }
 
-  // 底部：两座城市的完整卡片
+  // 底部：两座城市的完整卡片（左右铺满并列）
   function renderCards() {
     var el = $("compare-cards");
     if (!el) return;
@@ -212,7 +212,6 @@
     var list = [state.a, state.b].filter(Boolean);
     if (!list.length) return;
 
-    el.appendChild(sectionTitle("城市卡片"));
     var grid = document.createElement("div");
     grid.className = "compare-cards-grid";
     list.forEach(function (name) {
@@ -224,13 +223,6 @@
       grid.appendChild(card);
     });
     el.appendChild(grid);
-  }
-
-  function sectionTitle(text) {
-    var t = document.createElement("div");
-    t.className = "result-section-title";
-    t.textContent = text;
-    return t;
   }
 
   // ---------- 初始化 ----------

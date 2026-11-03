@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>城市对比 · 旅·问</title>
-  <link rel="stylesheet" href="style.css?v=v7">
+  <link rel="stylesheet" href="style.css?v=v8">
 </head>
 <body>
   <nav class="topbar">
@@ -18,11 +18,9 @@
   </nav>
 
   <main class="compare-main">
-    <section class="compare-head">
-      <h1>两座城市，并排看看</h1>
-      <p>从 7 个维度直接对比，帮你做最后的决定。</p>
-    </section>
+    <h1 class="compare-title">城市对比</h1>
 
+    <!-- 选城区：水平居中、足够宽 -->
     <section class="compare-selectors">
       <div class="compare-pick">
         <label for="cmp-a-input">城市 A</label>
@@ -47,20 +45,23 @@
       </div>
     </section>
 
-    <section class="compare-radar-card">
-      <div id="compare-radar" class="compare-radar"></div>
+    <!-- 雷达图 + 对比表：并列 -->
+    <section class="compare-panels">
+      <div class="compare-radar-card">
+        <div id="compare-radar" class="compare-radar"></div>
+      </div>
+      <div class="compare-table-card">
+        <div class="compare-table" id="compare-table"></div>
+      </div>
     </section>
 
-    <section class="compare-table-card">
-      <div class="compare-table" id="compare-table"></div>
-    </section>
-
+    <!-- 城市名片：左右铺满并列 -->
     <section class="compare-cards" id="compare-cards"></section>
   </main>
 
-  <script src="data.js?v=v7"></script>
+  <script src="data.js?v=v8"></script>
   <script src="echarts.min.js"></script>
-  <script src="common.js?v=v7"></script>
-  <script src="compare.js?v=v7"></script>
+  <script src="common.js?v=v8"></script>
+  <script src="compare.js?v=v8"></script>
 </body>
 </html>

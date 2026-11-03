@@ -256,10 +256,61 @@
     });
   }
 
+  // ============ 5. 地图总览 ============
+  function initHomeMap() {
+    var el = $("home-map");
+    if (!el) return;
+    if (!window.echarts || !window.CHINA_GEO) {
+      el.innerHTML = '<div class="map-fallback">地图组件未加载。</div>';
+      return;
+    }
+    window.echarts.registerMap("china", window.CHINA_GEO);
+    var chart = window.echarts.init(el);
+    var coords = window.CITY_COORDS || {};
+    var points = [];
+    cities().forEach(function (c) {
+      var co = coords[c.name];
+      if (!co) return;
+      points.push({ name: c.name, value: [co.lng, co.lat] });
+    });
+
+    chart.setOption({
+      tooltip: { trigger: "item", formatter: "{b}" },
+      geo: {
+        map: "china",
+        roam: true,
+        scaleLimit: { min: 0.7, max: 12 },
+        center: [104, 36],
+        zoom: 1.3,
+        itemStyle: { areaColor: "#f2f3f5", borderColor: "#d5d7db", borderWidth: 0.6 },
+        emphasis: { label: { show: false }, itemStyle: { areaColor: "#e3e9f0" } },
+        label: { show: false },
+        selectedMode: false
+      },
+      series: [{
+        name: "城市",
+        type: "scatter",
+        coordinateSystem: "geo",
+        symbolSize: 7,
+        itemStyle: { color: "#0071e3", borderColor: "#fff", borderWidth: 1 },
+        label: { show: false },
+        data: points
+      }]
+    });
+
+    chart.on("click", function (params) {
+      if (params && params.componentType === "series" && params.seriesName === "城市" && params.name) {
+        window.showCityPopover(params.name);
+      }
+    });
+    window.addEventListener("resize", function () { try { chart.resize(); } catch (e) {} });
+  }
+
   // ---------- 初始化 ----------
   initDraw();
   initSearch();
   initWordCloud();
+  initHomeMap();
   renderFavorites();
   window.addEventListener("wtg-fav-change", renderFavorites);
 })();

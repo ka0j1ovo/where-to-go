@@ -152,19 +152,43 @@
     return btn;
   };
 
-  // 城市卡片（弹层）：点击文字云 / 搜索结果 / 随机旅行 / 推荐器卡片打开
-  window.showCityPopover = function (name) {
-    var c = window.cityByName(name);
-    if (!c) return;
-    var old = document.getElementById("city-popover");
-    if (old) old.remove();
-
+  // 城市卡片主体（弹层与对比页共用）
+  window.cityCardBodyHtml = function (c) {
     var dimsHtml = (window.CITY_DIMS || []).map(function (d) {
       return '<div class="popover-dim">' +
         '<span class="popover-dim-name">' + window.escHtml(window.scaleNameOf(d.key, d.short)) + '</span>' +
         window.cityDimScoreHtml(d, c) +
       '</div>';
     }).join("");
+    var baiduUrl = "https://www.baidu.com/s?wd=" + encodeURIComponent(c.name + " 景点");
+    var funStars = c.fun != null ? "★".repeat(Math.max(1, c.fun)) : "—";
+
+    return '<div class="popover-head">' +
+        '<div class="popover-city">' + window.escHtml(c.name) + '</div>' +
+        '<div class="popover-prov">' + window.escHtml(c.province || "") + '</div>' +
+      '</div>' +
+      '<div class="popover-meta">' +
+        '<span>建议 ' + (c.minDays === c.maxDays ? c.minDays + " 天" : c.minDays + "-" + c.maxDays + " 天") + '</span>' +
+        '<span>消费 ' + window.costLabel(c.cost) + '</span>' +
+        '<span>公交 ' + window.transitLabel(c.transit) + '</span>' +
+        '<span>站长体验 ' + funStars + '</span>' +
+      '</div>' +
+      '<div class="popover-dims">' + dimsHtml + '</div>' +
+      '<a class="popover-baidu-link" href="' + baiduUrl + '" target="_blank" rel="noopener">' +
+        '🔎 百度搜索「' + window.escHtml(c.name) + ' 景点」' +
+      '</a>' +
+      '<div class="popover-notes">' + window.escHtml(c.notes || "暂无备注。") + '</div>' +
+      '<div class="popover-tags">' + window.cityAllTags(c).map(function (t) {
+        return '<span class="tag cat-' + (TAG_CATEGORY[t] || "none") + '">' + window.escHtml(t) + '</span>';
+      }).join("") + '</div>';
+  };
+
+  // 城市卡片（弹层）：点击文字云 / 搜索结果 / 随机旅行 / 推荐器卡片打开
+  window.showCityPopover = function (name) {
+    var c = window.cityByName(name);
+    if (!c) return;
+    var old = document.getElementById("city-popover");
+    if (old) old.remove();
 
     var baiduUrl = "https://www.baidu.com/s?wd=" + encodeURIComponent(name + " 景点");
 
@@ -176,21 +200,7 @@
         '<button class="popover-close" type="button" aria-label="关闭">×</button>' +
         '<a class="popover-baidu" href="' + baiduUrl + '" target="_blank" rel="noopener" title="百度搜索：' +
           window.escHtml(name) + ' 景点">🔎</a>' +
-        '<div class="popover-head">' +
-          '<div class="popover-city">' + window.escHtml(c.name) + '</div>' +
-          '<div class="popover-prov">' + window.escHtml(c.province || "") + '</div>' +
-        '</div>' +
-        '<div class="popover-meta">' +
-          '<span>建议 ' + (c.minDays === c.maxDays ? c.minDays + " 天" : c.minDays + "-" + c.maxDays + " 天") + '</span>' +
-          '<span>消费 ' + window.costLabel(c.cost) + '</span>' +
-          '<span>公交 ' + window.transitLabel(c.transit) + '</span>' +
-          '<span>站长体验 ' + (c.fun != null ? "★".repeat(Math.max(1, c.fun)) : "—") + '</span>' +
-        '</div>' +
-        '<div class="popover-dims">' + dimsHtml + '</div>' +
-        '<div class="popover-notes">' + window.escHtml(c.notes || "暂无备注。") + '</div>' +
-        '<div class="popover-tags">' + window.cityAllTags(c).map(function (t) {
-          return '<span class="tag cat-' + (TAG_CATEGORY[t] || "none") + '">' + window.escHtml(t) + '</span>';
-        }).join("") + '</div>' +
+        window.cityCardBodyHtml(c) +
         '<div class="popover-actions"></div>' +
       '</div>';
     document.body.appendChild(overlay);

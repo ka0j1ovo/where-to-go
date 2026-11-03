@@ -216,6 +216,9 @@ function activeDimCount() {
 // 高匹配提示阈值（百分比）
 var LOW_MATCH_THRESHOLD = 75;
 var PERFECT_MATCH_THRESHOLD = 92;
+// 推荐器结果：只展示匹配度 > 60% 的城市，最多 10 个
+var MIN_MATCH_SCORE = 60;
+var MAX_RESULT_CARDS = 10;
 // 分数浮点误差容差：小于该差值视为同分
 var SCORE_EPSILON = 1e-6;
 
@@ -797,7 +800,18 @@ function refreshMap(scored) {
   var dep = currentDeparture();
   // 维度不足时 scored 为 null/空 -> 地图上不显示任何城市蓝点
   var showCities = !!(scored && scored.length);
-  var ring = showCities ? ringCityList() : [];
+
+  // 地图只显示「当前结果列表」里的城市
+  var ring = [];
+  if (showCities) {
+    scored.forEach(function (item) {
+      var c = item.city;
+      var coord = cityCoord(c);
+      if (!coord) return;
+      var d = dep ? haversine(dep.lat, dep.lng, coord.lat, coord.lng) : null;
+      ring.push({ name: c.name, lng: coord.lng, lat: coord.lat, dist: d });
+    });
+  }
   var ringNames = {};
   ring.forEach(function (r) { ringNames[r.name] = true; });
 
@@ -1017,29 +1031,36 @@ function render() {
     return distanceRank(a.city, dep) - distanceRank(b.city, dep);
   });
 
-  summary.textContent = "共匹配 " + scored.length + " 座城市" +
+  // 只保留匹配度 > 60% 的城市，且最多展示 10 个
+  var qualified = scored.filter(function (x) { return x.score != null && x.score > MIN_MATCH_SCORE; });
+  var shown = qualified.slice(0, MAX_RESULT_CARDS);
+  var truncated = qualified.length > shown.length;
+
+  summary.textContent = "共匹配 " + shown.length + " 座城市" +
+    (truncated ? "（仅显示匹配度最高的 " + shown.length + " 座）" : "") +
     (excludedCount ? " · 已排除 " + excludedCount + " 座" : "");
 
   results.innerHTML = "";
-  if (scored.length === 0) {
-    results.innerHTML = '<div class="empty">没有符合条件的城市，试试放宽硬性条件（景色 tag / 出行距离 / 旅行天数 / 交通方式）。</div>';
+  if (shown.length === 0) {
+    results.innerHTML = '<div class="empty">没有匹配度超过 ' + MIN_MATCH_SCORE +
+      '% 的城市。<br>试试放宽硬性条件，或者把不太在意的维度设为「无所谓」。</div>';
   } else {
-    scored.forEach(function (item, i) { results.appendChild(makeCard(item, i, true, dep)); });
+    shown.forEach(function (item, i) { results.appendChild(makeCard(item, i, true, dep)); });
 
     // 结果提示：天选城市 / 高匹配偏少
-    var best = scored[0].score;
+    var best = shown[0].score;
     if (best != null && best > PERFECT_MATCH_THRESHOLD) {
       notice.textContent = "简直是你的天选城市！";
       notice.classList.add("notice-perfect");
       notice.style.display = "";
-    } else if (!scored.some(function (it) { return it.score != null && it.score > LOW_MATCH_THRESHOLD; })) {
+    } else if (best != null && best <= LOW_MATCH_THRESHOLD) {
       notice.textContent = "筛选后高匹配度城市较少，有些不在意的维度可以选择无所谓哦 :)";
       notice.classList.add("notice-sparse");
       notice.style.display = "";
     }
   }
 
-  refreshMap(scored);
+  refreshMap(shown);
 }
 
 // —— 同分时按出行距离排序：无法定位的城市排最后 ——

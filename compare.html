@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>城市对比 · 旅·问</title>
-  <link rel="stylesheet" href="style.css?v=v2">
+  <link rel="stylesheet" href="style.css?v=v3">
 </head>
 <body>
   <nav class="topbar">
@@ -25,19 +25,25 @@
 
     <section class="compare-selectors">
       <div class="compare-pick">
-        <label for="cmp-a">城市 A</label>
-        <div class="compare-pick-row">
-          <select id="cmp-a" class="compare-select"></select>
-          <span id="fav-a" class="fav-slot"></span>
+        <label for="cmp-a-input">城市 A</label>
+        <div class="compare-search-box">
+          <input id="cmp-a-input" class="compare-search" type="text" autocomplete="off"
+                 placeholder="输入城市 / 省份 / 标签">
+          <div id="cmp-a-results" class="search-results"></div>
         </div>
+        <div id="cmp-a-chosen" class="compare-chosen"></div>
       </div>
+
       <div class="compare-vs">VS</div>
+
       <div class="compare-pick">
-        <label for="cmp-b">城市 B</label>
-        <div class="compare-pick-row">
-          <select id="cmp-b" class="compare-select"></select>
-          <span id="fav-b" class="fav-slot"></span>
+        <label for="cmp-b-input">城市 B</label>
+        <div class="compare-search-box">
+          <input id="cmp-b-input" class="compare-search" type="text" autocomplete="off"
+                 placeholder="输入城市 / 省份 / 标签">
+          <div id="cmp-b-results" class="search-results"></div>
         </div>
+        <div id="cmp-b-chosen" class="compare-chosen"></div>
       </div>
     </section>
 
@@ -48,11 +54,13 @@
     <section class="compare-table-card">
       <div class="compare-table" id="compare-table"></div>
     </section>
+
+    <section class="compare-cards" id="compare-cards"></section>
   </main>
 
-  <script src="data.js?v=v2"></script>
+  <script src="data.js?v=v3"></script>
   <script src="echarts.min.js"></script>
-  <script src="common.js?v=v2"></script>
-  <script src="compare.js?v=v2"></script>
+  <script src="common.js?v=v3"></script>
+  <script src="compare.js?v=v3"></script>
 </body>
 </html>

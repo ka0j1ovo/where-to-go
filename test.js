@@ -56,6 +56,8 @@
   var currentIdx = 0;
   var collectedTags = [];
   var pendingRadar = null;   // 待初始化的雷达图（须在插入文档后 init）
+  var skipUsed = 0;          // 已跳过的题数
+  var MAX_SKIP = 3;          // 最多可跳过 3 题
 
   var $ = function (id) { return document.getElementById(id); };
   function scrollTop() {
@@ -117,6 +119,14 @@
     $("test-next").disabled = !hasAnswer;
     $("test-prev").disabled = (currentIdx === 0);
 
+    // 跳过：最多 3 次
+    var skipBtn = $("test-skip");
+    if (skipBtn) {
+      var left = MAX_SKIP - skipUsed;
+      skipBtn.disabled = left <= 0;
+      skipBtn.textContent = left > 0 ? ("跳过（剩 " + left + "）") : "已用完跳过";
+    }
+
     // 最后一题按钮文案
     $("test-next").textContent = (currentIdx === total - 1) ? "看结果 ✦" : "下一题 →";
 
@@ -129,6 +139,7 @@
     currentIdx = 0;
     collectedTags = [];
     pendingRadar = null;
+    skipUsed = 0;
     $("test-intro").hidden = true;
     $("test-quiz").hidden = false;
     $("result-view").hidden = true;
@@ -142,6 +153,15 @@
   }
   function goPrev() {
     if (currentIdx > 0) { currentIdx--; renderQuestion(); }
+  }
+  // 跳过当前题（不计分），最多 3 次
+  function goSkip() {
+    if (skipUsed >= MAX_SKIP) return;
+    skipUsed++;
+    answers[currentIdx] = -1;
+    if (currentIdx >= questions.length - 1) { finish(); return; }
+    currentIdx++;
+    renderQuestion();
   }
 
   // ---------- 计分引擎 ----------
@@ -567,6 +587,7 @@
   $("start-test").addEventListener("click", startTest);
   $("test-next").addEventListener("click", goNext);
   $("test-prev").addEventListener("click", goPrev);
+  if ($("test-skip")) $("test-skip").addEventListener("click", goSkip);
 
   // 若 URL 带分享参数，直接恢复结果
   restoreFromShare();

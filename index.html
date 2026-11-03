@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>旅·问 · where-to-go</title>
-  <link rel="stylesheet" href="style.css?v=v2">
+  <link rel="stylesheet" href="style.css?v=v3">
 </head>
 <body>
   <nav class="topbar">
@@ -105,6 +105,15 @@
       <div id="wordcloud" class="wordcloud"></div>
     </section>
 
+    <!-- 地图总览 -->
+    <section class="home-section map-section">
+      <div class="home-section-head">
+        <h2>地图总览</h2>
+        <p>点击任意小蓝点查看城市</p>
+      </div>
+      <div id="home-map" class="home-map"></div>
+    </section>
+
     <!-- 心愿单 -->
     <section class="home-section fav-section" id="fav-section" style="display:none">
       <div class="home-section-head">
@@ -114,8 +123,11 @@
     </section>
   </main>
 
-  <script src="data.js?v=v2"></script>
-  <script src="common.js?v=v2"></script>
-  <script src="home.js?v=v2"></script>
+  <script src="data.js?v=v3"></script>
+  <script src="echarts.min.js"></script>
+  <script src="china.js?v=v3"></script>
+  <script src="geo.js?v=v3"></script>
+  <script src="common.js?v=v3"></script>
+  <script src="home.js?v=v3"></script>
 </body>
 </html>

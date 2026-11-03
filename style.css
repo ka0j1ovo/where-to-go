@@ -1025,6 +1025,69 @@ input[type="range"]::-moz-range-thumb {
 .score-bar i.on { background: currentColor; opacity: .9; }
 .result-reason-body .score-view { color: var(--accent); }
 
+/* 城市卡片内的百度搜索引导 */
+.popover-baidu-link {
+  display: inline-block;
+  margin-bottom: 14px;
+  font-size: 13px; font-weight: 600;
+  color: var(--accent); text-decoration: none;
+  background: var(--accent-soft);
+  padding: 8px 14px; border-radius: 999px;
+  transition: filter .15s ease;
+}
+.popover-baidu-link:hover { filter: brightness(.96); }
+
+/* 对比页：搜索选城 */
+.compare-search-box { position: relative; }
+.compare-search {
+  width: 100%; padding: 12px 14px;
+  border: 1.5px solid var(--border); border-radius: 12px;
+  font-size: 14px; background: #fff; outline: none;
+  transition: border-color .15s ease;
+}
+.compare-search:focus { border-color: var(--accent); }
+
+.compare-chosen { margin-top: 8px; min-height: 34px; }
+.compare-chosen-inner {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 8px 6px 12px; border-radius: 999px;
+  background: var(--accent-soft); color: var(--accent);
+  font-size: 13px; font-weight: 600;
+}
+.compare-chosen-inner.b { background: #fff2e0; color: #c76a00; }
+.compare-chosen-name { font-weight: 700; }
+.compare-chosen-prov { font-weight: 400; opacity: .8; font-size: 12px; }
+.compare-chosen-clear {
+  border: none; background: rgba(0,0,0,.07); color: inherit;
+  width: 20px; height: 20px; border-radius: 50%;
+  cursor: pointer; font-size: 13px; line-height: 1;
+}
+.compare-chosen-clear:hover { background: rgba(0,0,0,.14); }
+.compare-chosen-empty { font-size: 12.5px; color: var(--muted); }
+
+.compare-placeholder {
+  padding: 44px 16px; text-align: center;
+  color: var(--muted); font-size: 13.5px;
+}
+
+/* 对比页底部：城市卡片 */
+.compare-cards { margin-top: 22px; }
+.compare-cards-grid {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;
+}
+.compare-city-card {
+  background: var(--panel); border-radius: 20px;
+  padding: 22px; box-shadow: var(--shadow);
+}
+
+/* 首页地图总览 */
+.home-map {
+  width: 100%; height: 460px;
+  border-radius: 20px; overflow: hidden;
+  background: var(--panel); box-shadow: var(--shadow);
+}
+.map-fallback { padding: 44px; text-align: center; color: var(--muted); }
+
 /* 顶部导航移动端 */
 @media (max-width: 900px) {
   .topbar { padding: 0 16px; gap: 8px; }
@@ -1042,6 +1105,8 @@ input[type="range"]::-moz-range-thumb {
   main.home { padding: 32px 16px 60px; }
   .home-cards { grid-template-columns: 1fr; }
   .draw-stage { width: 240px; height: 360px; }
+  .home-map { height: 340px; }
+  .compare-cards-grid { grid-template-columns: 1fr; }
   .compare-selectors { flex-direction: column; align-items: stretch; gap: 12px; }
   .compare-vs { text-align: center; padding-bottom: 0; }
   .cmp-table-head, .cmp-row { grid-template-columns: 84px 1fr 1fr; }

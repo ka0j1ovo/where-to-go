@@ -465,27 +465,10 @@ input[type="range"]::-moz-range-thumb {
   background: var(--accent-soft);
   color: var(--accent);
 }
-/* 天选城市：浅黄底 + 2s 一个周期的淡入淡出呼吸 */
-.notice.notice-perfect {
-  color: var(--warn);
-  background: linear-gradient(90deg, #fff8e1, #fff0b8, #fff8e1);
-  background-size: 200% 100%;
-  border: 1px solid var(--warn-border);
-  text-align: center;
-  font-size: 15px;
-  box-shadow: 0 2px 12px rgba(242, 190, 60, .35);
-  animation: perfect-glow 2s ease-in-out infinite, perfect-shine 4s linear infinite;
-}
-@keyframes perfect-glow {
-  0%, 100% { opacity: .55; box-shadow: 0 2px 6px rgba(242, 190, 60, .18); }
-  50%      { opacity: 1;   box-shadow: 0 4px 18px rgba(242, 190, 60, .55); }
-}
+/* 天选城市条的位置动画（卡片底部使用时复用） */
 @keyframes perfect-shine {
   0%   { background-position: 0% 50%; }
   100% { background-position: 200% 50%; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .notice.notice-perfect { animation: none; opacity: 1; }
 }
 .jumpmode-label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
 
@@ -504,6 +487,25 @@ input[type="range"]::-moz-range-thumb {
 }
 .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
 .card.flash { transform: translateY(-2px); box-shadow: 0 0 0 2px var(--accent), var(--shadow-hover); }
+
+/* 最高匹配卡片底部的「天选城市」条（贴满卡片下边缘） */
+.card-perfect {
+  margin: 14px -18px -18px;
+  padding: 13px 18px 14px;
+  border-radius: 0 0 20px 20px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  color: var(--warn);
+  background: linear-gradient(90deg, #fff8e1, #ffe9a8, #fff8e1);
+  background-size: 200% 100%;
+  border-top: 1px solid var(--warn-border);
+  animation: perfect-shine 4s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-perfect { animation: none; }
+}
 
 .card-top { display: flex; align-items: center; gap: 12px; }
 .rank {

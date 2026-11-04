@@ -938,7 +938,7 @@ function fitChip(label, m) {
   return '<span class="fit ' + cls + '">' + esc(label) + ' ' + mark + '</span>';
 }
 
-function makeCard(item, i, hasPref, dep) {
+function makeCard(item, i, hasPref, dep, perfect) {
   var c = item.city;
   var el = document.createElement("div");
   el.className = "card";
@@ -986,7 +986,8 @@ function makeCard(item, i, hasPref, dep) {
     '<div class="meta">' + metaParts.join(" · ") + '</div>' +
     fitHtml +
     (tagHtml ? '<div class="tags">' + tagHtml + '</div>' : "") +
-    (c.notes ? '<div class="notes">' + esc(c.notes) + '</div>' : "");
+    (c.notes ? '<div class="notes">' + esc(c.notes) + '</div>' : "") +
+    (perfect ? '<div class="card-perfect">简直是你的天选城市！</div>' : "");
   return el;
 }
 
@@ -1045,19 +1046,25 @@ function render() {
   if (shown.length === 0) {
     results.innerHTML = '<div class="empty">没有匹配度超过 ' + MIN_MATCH_SCORE +
       '% 的城市。<br>试试放宽硬性条件，或者把不太在意的维度设为「无所谓」。</div>';
+    notice.style.display = "none";
   } else {
-    shown.forEach(function (item, i) { results.appendChild(makeCard(item, i, true, dep)); });
-
-    // 结果提示：天选城市 / 高匹配偏少
+    // 先算最高分，决定第 1 张卡片是否带「天选城市」条
     var best = shown[0].score;
-    if (best != null && best > PERFECT_MATCH_THRESHOLD) {
-      notice.textContent = "简直是你的天选城市！";
-      notice.classList.add("notice-perfect");
-      notice.style.display = "";
-    } else if (best != null && best <= LOW_MATCH_THRESHOLD) {
+    var perfectTop = best != null && best > PERFECT_MATCH_THRESHOLD;
+
+    shown.forEach(function (item, i) {
+      results.appendChild(makeCard(item, i, true, dep, perfectTop && i === 0));
+    });
+
+    // 「天选城市」已移入卡片底部；这里只处理「高匹配偏少」的整体提示
+    if (!perfectTop && best != null && best <= LOW_MATCH_THRESHOLD) {
       notice.textContent = "筛选后高匹配度城市较少，有些不在意的维度可以选择无所谓哦 :)";
-      notice.classList.add("notice-sparse");
+      notice.className = "notice notice-sparse";
       notice.style.display = "";
+    } else {
+      notice.textContent = "";
+      notice.className = "notice";
+      notice.style.display = "none";
     }
   }
 

@@ -414,8 +414,6 @@ window.TEST_QUESTIONS = [
 window.TEST_META = {
   minQuestions: 20,
   maxQuestions: 30,
-  // 至少要有这么多个维度有明确倾向，才给出推荐结果
-  minActiveDims: 3,
   // 站长体验提示：fun <= 该值时，结果页追加一行委婉说明
   funHintThreshold: 2,
   funHints: {

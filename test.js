@@ -185,9 +185,17 @@
       prefs[d.key] = { weight: w, want: want, raw: raw };
     });
 
-    // 统计「有明确倾向」的维度数（不再兜底强行凑维度）
+    // 兜底：如果一个维度都没留下，取 |raw| 最大的两个维度纳入考虑，
+    // 保证「怎么样都得给个结果」
     var activeCount = 0;
     DIMS.forEach(function (d) { if (prefs[d.key].weight > 0) activeCount++; });
+    if (activeCount === 0) {
+      var sorted = DIMS.slice().sort(function (a, b) {
+        return Math.abs(prefs[b.key].raw) - Math.abs(prefs[a.key].raw);
+      });
+      sorted.slice(0, 2).forEach(function (d) { prefs[d.key].weight = 1; });
+      activeCount = 2;
+    }
 
     return { prefs: prefs, inconsistent: inconsistent, activeCount: activeCount };
   }
@@ -237,14 +245,6 @@
     $("result-view").hidden = false;
     $("result-body").innerHTML = "";
 
-    // 维度不足 3 个：不给推荐结果，只提示不准确
-    var minDims = (window.TEST_META && window.TEST_META.minActiveDims) || 3;
-    if (r.cp.activeCount < minDims) {
-      $("result-body").appendChild(buildInaccurate(r, minDims));
-      scrollTop();
-      return;
-    }
-
     if (!r.scored.length) {
       $("result-body").innerHTML = '<div class="empty">这次没有算出匹配城市，再测一次试试吧。</div>';
       scrollTop();
@@ -254,39 +254,6 @@
     // 图必须在插入文档后初始化，否则容器宽度为 0
     setTimeout(initRadarChart, 0);
     scrollTop();
-  }
-
-  // 维度不足时的提示页（不展示任何城市结果）
-  function buildInaccurate(r, minDims) {
-    var wrap = document.createElement("div");
-    wrap.className = "result-inaccurate";
-    wrap.innerHTML =
-      '<div class="result-inaccurate-icon">✦</div>' +
-      '<h2 class="result-inaccurate-title">这次的结果可能不太准确</h2>' +
-      '<p class="result-inaccurate-text">' +
-        '你在 ' + r.cp.activeCount + ' 个维度上给出了明确倾向，' +
-        '至少要 ' + minDims + ' 个维度才能给出可靠的推荐。' +
-      '</p>' +
-      '<p class="result-inaccurate-text">' +
-        '可以重新测一次，按第一反应选，别太犹豫。' +
-      '</p>' +
-      '<div class="result-actions"></div>';
-
-    var actions = wrap.querySelector(".result-actions");
-    var retake = document.createElement("button");
-    retake.type = "button";
-    retake.className = "test-btn-primary";
-    retake.textContent = "重新测一次";
-    retake.addEventListener("click", function () { location.href = location.pathname; });
-    actions.appendChild(retake);
-
-    var back = document.createElement("a");
-    back.className = "test-btn-ghost";
-    back.href = "index.html";
-    back.textContent = "回首页";
-    actions.appendChild(back);
-
-    return wrap;
   }
 
   function esc(s) {

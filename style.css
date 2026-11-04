@@ -730,16 +730,6 @@ input[type="range"]::-moz-range-thumb {
   margin-top: 8px; flex-wrap: wrap;
 }
 
-/* 维度不足时的提示页 */
-.result-inaccurate {
-  background: var(--panel); border-radius: 22px; padding: 40px 26px;
-  box-shadow: var(--shadow); text-align: center;
-}
-.result-inaccurate-icon { font-size: 30px; color: var(--warn); margin-bottom: 14px; }
-.result-inaccurate-title { margin: 0 0 14px; font-size: 21px; font-weight: 700; letter-spacing: -.01em; }
-.result-inaccurate-text { margin: 0 0 8px; font-size: 14px; color: #4b5563; line-height: 1.75; }
-.result-inaccurate .result-actions { margin-top: 22px; }
-
 /* ============ 首页通用 section ============ */
 .home-section { margin: 40px 0; }
 .home-section-head { text-align: center; margin-bottom: 20px; }

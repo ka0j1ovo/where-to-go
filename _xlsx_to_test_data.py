@@ -192,8 +192,6 @@ def main():
     lines.append('window.TEST_META = {')
     lines.append('  minQuestions: 20,')
     lines.append('  maxQuestions: 30,')
-    lines.append('  // 至少要有这么多个维度有明确倾向，才给出推荐结果')
-    lines.append('  minActiveDims: 3,')
     lines.append('  // 站长体验提示：fun <= 该值时，结果页追加一行委婉说明')
     lines.append('  funHintThreshold: 2,')
     lines.append('  funHints: {')

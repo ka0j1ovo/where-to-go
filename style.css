@@ -479,28 +479,30 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .card {
+  --card-pad: 18px;
   background: var(--panel);
   border-radius: 20px;
-  padding: 18px;
+  padding: var(--card-pad);
   box-shadow: var(--shadow);
+  overflow: hidden;
   transition: transform .16s ease, box-shadow .16s ease;
 }
 .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
 .card.flash { transform: translateY(-2px); box-shadow: 0 0 0 2px var(--accent), var(--shadow-hover); }
 
-/* 最高匹配卡片底部的「天选城市」条（贴满卡片下边缘） */
+/* 最高匹配卡片底部的「天选城市」条：铺满整个卡片底部 */
 .card-perfect {
-  margin: 14px -18px -18px;
-  padding: 13px 18px 14px;
+  margin: 14px calc(var(--card-pad) * -1) calc(var(--card-pad) * -1);
+  padding: 15px var(--card-pad) 17px;
   border-radius: 0 0 20px 20px;
   text-align: center;
   font-size: 15px;
   font-weight: 700;
   letter-spacing: .02em;
   color: var(--warn);
-  background: linear-gradient(90deg, #fff8e1, #ffe9a8, #fff8e1);
+  background: linear-gradient(90deg, #fffdf7, #fff4d4, #fffdf7);
   background-size: 200% 100%;
-  border-top: 1px solid var(--warn-border);
+  border-top: 1px solid #f6e8c4;
   animation: perfect-shine 4s linear infinite;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -1179,7 +1181,7 @@ input[type="range"]::-moz-range-thumb {
   /* 推荐器 */
   main { padding: 14px 12px 36px; }
   #china-map { height: 260px; }
-  .card { padding: 15px; }
+  .card { --card-pad: 15px; }
   .card-top { gap: 10px; }
   .name { font-size: 15px; }
   .score { font-size: 21px; }

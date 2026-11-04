@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // 分享图片生成：把测试结果画成一张可下载的卡片
 // 依赖：qrdata.js（window.SITE_QR_DATAURI / window.SITE_URL）
 // 用法：window.buildShareImage(payload, cb) -> cb(dataUrl)
@@ -22,90 +22,92 @@
 
   function draw(payload) {
     return new Promise(function (resolve) {
+      var dims = payload.dims || [];
+      var rowH = 64;                                  // 行距（加大）
+      var top = 336;
+      var footerTop = top + dims.length * rowH + 24;  // 底部区域随内容下移
+      var h = footerTop + 224;                        // 画布高度随内容
       var scale = 2;
       var canvas = document.createElement("canvas");
       canvas.width = W * scale;
-      canvas.height = H * scale;
+      canvas.height = h * scale;
       var ctx = canvas.getContext("2d");
       ctx.scale(scale, scale);
 
       // 背景
-      var bg = ctx.createLinearGradient(0, 0, 0, H);
+      var bg = ctx.createLinearGradient(0, 0, 0, h);
       bg.addColorStop(0, "#ffffff");
       bg.addColorStop(1, "#f5f7fb");
       ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, W, H);
+      ctx.fillRect(0, 0, W, h);
 
       // 顶部品牌
       ctx.fillStyle = "#0071e3";
-      ctx.font = "700 26px " + FONT;
+      ctx.font = "700 30px " + FONT;
       ctx.textBaseline = "alphabetic";
-      ctx.fillText("旅·问", PAD, 84);
+      ctx.fillText("旅·问", PAD, 86);
       ctx.fillStyle = "#8e8e93";
-      ctx.font = "400 16px " + FONT;
-      ctx.fillText("天选之城测试", PAD + 78, 84);
+      ctx.font = "400 20px " + FONT;
+      ctx.fillText("天选之城测试", PAD + 92, 86);
 
       // 标题
       ctx.fillStyle = "#8e8e93";
-      ctx.font = "400 17px " + FONT;
-      ctx.fillText("我的天选之城", PAD, 158);
+      ctx.font = "400 21px " + FONT;
+      ctx.fillText("我的天选之城", PAD, 164);
 
       // 城市名（过长时自动缩小字号，避免溢出）
-      var nameFont = 62;
+      var nameFont = 66;
       ctx.font = "800 " + nameFont + "px " + FONT;
       var maxNameW = W - PAD * 2;
-      while (ctx.measureText(payload.cityName).width > maxNameW && nameFont > 26) {
+      while (ctx.measureText(payload.cityName).width > maxNameW && nameFont > 30) {
         nameFont -= 4;
         ctx.font = "800 " + nameFont + "px " + FONT;
       }
       ctx.fillStyle = "#1d1d1f";
-      ctx.fillText(payload.cityName, PAD, 228);
+      ctx.fillText(payload.cityName, PAD, 240);
 
       // 省份 + 匹配度
       ctx.fillStyle = "#8e8e93";
-      ctx.font = "400 17px " + FONT;
-      ctx.fillText(payload.province || "", PAD, 262);
+      ctx.font = "400 21px " + FONT;
+      ctx.fillText(payload.province || "", PAD, 276);
 
       if (payload.score != null) {
         ctx.fillStyle = "#0071e3";
-        ctx.font = "800 40px " + FONT;
+        ctx.font = "800 44px " + FONT;
         var scoreText = Math.round(payload.score) + "%";
         var sw = ctx.measureText(scoreText).width;
-        ctx.fillText(scoreText, W - PAD - sw, 232);
+        ctx.fillText(scoreText, W - PAD - sw, 244);
         ctx.fillStyle = "#8e8e93";
-        ctx.font = "400 15px " + FONT;
+        ctx.font = "400 19px " + FONT;
         var lab = "匹配度";
         var lw = ctx.measureText(lab).width;
-        ctx.fillText(lab, W - PAD - lw, 256);
+        ctx.fillText(lab, W - PAD - lw, 270);
       }
 
       // 分隔线
       ctx.strokeStyle = "#e8e8ed";
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.moveTo(PAD, 292);
-      ctx.lineTo(W - PAD, 292);
+      ctx.moveTo(PAD, 306);
+      ctx.lineTo(W - PAD, 306);
       ctx.stroke();
 
       // 维度列表
-      var dims = payload.dims || [];
-      var rowH = 56;
-      var top = 330;
       ctx.textBaseline = "middle";
       dims.forEach(function (d, i) {
         var y = top + i * rowH;
         // 名称
         ctx.fillStyle = "#4b5563";
-        ctx.font = "500 17px " + FONT;
+        ctx.font = "500 21px " + FONT;
         ctx.fillText(d.name, PAD, y);
         // 数字
         ctx.textAlign = "right";
         ctx.fillStyle = "#0071e3";
-        ctx.font = "700 20px " + FONT;
-        ctx.fillText(String(d.value), W - PAD - 96, y);
+        ctx.font = "700 24px " + FONT;
+        ctx.fillText(String(d.value), W - PAD - 104, y);
         ctx.textAlign = "left";
         // 5 格刻度条
-        var segW = 15, segH = 18, gap = 5;
+        var segW = 16, segH = 20, gap = 6;
         var barX = W - PAD - (segW * 5 + gap * 4);
         for (var k = 0; k < 5; k++) {
           var x = barX + k * (segW + gap);
@@ -117,7 +119,6 @@
       ctx.textBaseline = "alphabetic";
 
       // 底部区域
-      var footerTop = H - PAD - 150;
       ctx.strokeStyle = "#e8e8ed";
       ctx.beginPath();
       ctx.moveTo(PAD, footerTop);
@@ -126,19 +127,19 @@
 
       // 引导文字
       ctx.fillStyle = "#1d1d1f";
-      ctx.font = "700 19px " + FONT;
-      ctx.fillText("扫码，测出你的天选之城", PAD, footerTop + 52);
+      ctx.font = "700 23px " + FONT;
+      ctx.fillText("扫码，测出你的天选之城", PAD, footerTop + 60);
       ctx.fillStyle = "#8e8e93";
-      ctx.font = "400 14px " + FONT;
-      ctx.fillText("旅·问 · 100 座城市的真实旅行数据", PAD, footerTop + 80);
+      ctx.font = "400 18px " + FONT;
+      ctx.fillText("旅·问 · 100 座城市的真实旅行数据", PAD, footerTop + 96);
       ctx.fillStyle = "#c7c7cc";
-      ctx.font = "400 12px " + FONT;
-      ctx.fillText((window.SITE_URL || "").replace(/^https?:\/\//, "").replace(/\/$/, ""), PAD, footerTop + 104);
+      ctx.font = "400 16px " + FONT;
+      ctx.fillText((window.SITE_URL || "").replace(/^https?:\/\//, "").replace(/\/$/, ""), PAD, footerTop + 126);
 
       // 二维码
-      var qrSize = 116;
+      var qrSize = 124;
       var qrX = W - PAD - qrSize - 8;
-      var qrY = footerTop + 22;
+      var qrY = footerTop + 26;
       ctx.fillStyle = "#ffffff";
       roundRect(ctx, qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 10);
       ctx.fill();
@@ -146,6 +147,13 @@
       ctx.lineWidth = 1;
       roundRect(ctx, qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 10);
       ctx.stroke();
+
+      // 二维码下方提示
+      ctx.fillStyle = "#1d1d1f";
+      ctx.font = "700 20px " + FONT;
+      ctx.textAlign = "center";
+      ctx.fillText("你也来试试↑", qrX + qrSize / 2, qrY + qrSize + 38);
+      ctx.textAlign = "left";
 
       var qrSrc = window.SITE_QR_DATAURI;
       if (!qrSrc) { resolve(canvas.toDataURL("image/png")); return; }
@@ -173,7 +181,7 @@
   // payload = { count, cities: [{ name, province, score }, ...] }
   function drawRecommender(payload) {
     return new Promise(function (resolve) {
-      var H2 = 780;
+      var H2 = 860;
       var scale = 2;
       var canvas = document.createElement("canvas");
       canvas.width = W * scale;
@@ -191,76 +199,76 @@
 
       // 顶部品牌
       ctx.fillStyle = "#0071e3";
-      ctx.font = "700 26px " + FONT;
-      ctx.fillText("旅·问", PAD, 84);
+      ctx.font = "700 30px " + FONT;
+      ctx.fillText("旅·问", PAD, 86);
       ctx.fillStyle = "#8e8e93";
-      ctx.font = "400 16px " + FONT;
-      ctx.fillText("旅游城市推荐器", PAD + 78, 84);
+      ctx.font = "400 20px " + FONT;
+      ctx.fillText("旅游城市推荐器", PAD + 92, 86);
 
       // 标题
       ctx.fillStyle = "#8e8e93";
-      ctx.font = "400 17px " + FONT;
-      ctx.fillText("我的推荐结果", PAD, 152);
+      ctx.font = "400 21px " + FONT;
+      ctx.fillText("我的推荐结果", PAD, 162);
 
       var cities = payload.cities || [];
       var top = cities[0];
       if (top) {
         // 第一名
-        var nameFont = 46;
+        var nameFont = 50;
         ctx.font = "800 " + nameFont + "px " + FONT;
-        while (ctx.measureText(top.name).width > W - PAD * 2 - 130 && nameFont > 24) {
+        while (ctx.measureText(top.name).width > W - PAD * 2 - 140 && nameFont > 28) {
           nameFont -= 3;
           ctx.font = "800 " + nameFont + "px " + FONT;
         }
         ctx.fillStyle = "#1d1d1f";
-        ctx.fillText(top.name, PAD, 218);
+        ctx.fillText(top.name, PAD, 232);
 
         var st = Math.round(top.score) + "%";
         ctx.fillStyle = "#0071e3";
-        ctx.font = "800 40px " + FONT;
+        ctx.font = "800 44px " + FONT;
         var sw = ctx.measureText(st).width;
-        ctx.fillText(st, W - PAD - sw, 216);
+        ctx.fillText(st, W - PAD - sw, 230);
 
         ctx.fillStyle = "#8e8e93";
-        ctx.font = "400 15px " + FONT;
-        ctx.fillText(top.province || "", PAD, 244);
-        ctx.fillText("共匹配 " + (payload.count || cities.length) + " 座城市", W - PAD - 110, 244);
+        ctx.font = "400 19px " + FONT;
+        ctx.fillText(top.province || "", PAD, 262);
+        ctx.fillText("共匹配 " + (payload.count || cities.length) + " 座城市", W - PAD - 130, 262);
 
         // 分隔线
         ctx.strokeStyle = "#e8e8ed";
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.moveTo(PAD, 286);
-        ctx.lineTo(W - PAD, 286);
+        ctx.moveTo(PAD, 302);
+        ctx.lineTo(W - PAD, 302);
         ctx.stroke();
 
         // 2-5 名
         var rows = cities.slice(1, 5);
         rows.forEach(function (c, i) {
-          var y = 332 + i * 56;
+          var y = 356 + i * 64;
           ctx.fillStyle = "#c7c7cc";
-          ctx.font = "700 15px " + FONT;
+          ctx.font = "700 19px " + FONT;
           ctx.fillText(String(i + 2), PAD, y);
 
           ctx.fillStyle = "#1d1d1f";
-          ctx.font = "600 19px " + FONT;
-          ctx.fillText(c.name, PAD + 28, y);
+          ctx.font = "600 23px " + FONT;
+          ctx.fillText(c.name, PAD + 34, y);
           var nw = ctx.measureText(c.name).width;
 
           ctx.fillStyle = "#8e8e93";
-          ctx.font = "400 13px " + FONT;
-          ctx.fillText(c.province || "", PAD + 28 + nw + 10, y);
+          ctx.font = "400 17px " + FONT;
+          ctx.fillText(c.province || "", PAD + 34 + nw + 12, y);
 
           ctx.textAlign = "right";
           ctx.fillStyle = "#0071e3";
-          ctx.font = "700 19px " + FONT;
+          ctx.font = "700 23px " + FONT;
           ctx.fillText(Math.round(c.score) + "%", W - PAD, y);
           ctx.textAlign = "left";
         });
       }
 
       // 底部
-      var footerTop = 596;
+      var footerTop = 636;
       ctx.strokeStyle = "#e8e8ed";
       ctx.beginPath();
       ctx.moveTo(PAD, footerTop);
@@ -268,19 +276,19 @@
       ctx.stroke();
 
       ctx.fillStyle = "#1d1d1f";
-      ctx.font = "700 19px " + FONT;
-      ctx.fillText("扫码，找到你的城市", PAD, footerTop + 46);
+      ctx.font = "700 23px " + FONT;
+      ctx.fillText("扫码，找到你的城市", PAD, footerTop + 60);
       ctx.fillStyle = "#8e8e93";
-      ctx.font = "400 14px " + FONT;
-      ctx.fillText("旅·问 · 100 座城市的真实旅行数据", PAD, footerTop + 74);
+      ctx.font = "400 18px " + FONT;
+      ctx.fillText("旅·问 · 100 座城市的真实旅行数据", PAD, footerTop + 96);
       ctx.fillStyle = "#c7c7cc";
-      ctx.font = "400 12px " + FONT;
-      ctx.fillText((window.SITE_URL || "").replace(/^https?:\/\//, "").replace(/\/$/, ""), PAD, footerTop + 96);
+      ctx.font = "400 16px " + FONT;
+      ctx.fillText((window.SITE_URL || "").replace(/^https?:\/\//, "").replace(/\/$/, ""), PAD, footerTop + 126);
 
       // 二维码
-      var qrSize = 112;
+      var qrSize = 120;
       var qrX = W - PAD - qrSize - 8;
-      var qrY = footerTop + 18;
+      var qrY = footerTop + 26;
       ctx.fillStyle = "#ffffff";
       roundRect(ctx, qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 10);
       ctx.fill();
@@ -288,6 +296,13 @@
       ctx.lineWidth = 1;
       roundRect(ctx, qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 10);
       ctx.stroke();
+
+      // 二维码下方提示
+      ctx.fillStyle = "#1d1d1f";
+      ctx.font = "700 20px " + FONT;
+      ctx.textAlign = "center";
+      ctx.fillText("你也来试试↑", qrX + qrSize / 2, qrY + qrSize + 38);
+      ctx.textAlign = "left";
 
       var qrSrc = window.SITE_QR_DATAURI;
       if (!qrSrc) { resolve(canvas.toDataURL("image/png")); return; }

@@ -20,7 +20,8 @@
     return window.scoreHtml ? window.scoreHtml(v) : String(v);
   }
 
-  var DIMS = window.CITY_DIMS || [];
+  // 测试只用这 6 个维度（「停留时间」不参与测试筛选）
+  var DIMS = (window.CITY_DIMS || []).filter(function (d) { return d.key !== "stay"; });
   var DIM_BY_KEY = {};
   DIMS.forEach(function (d) { DIM_BY_KEY[d.key] = d; });
 
@@ -64,28 +65,9 @@
     try { window.scrollTo(0, 0); } catch (e) { /* 非浏览器环境忽略 */ }
   }
 
-  // ---------- 抽题：固定模板 + 组内随机 ----------
+  // ---------- 取题：全部题目，顺序打乱 ----------
   function drawQuestions() {
-    var templates = window.TEST_TEMPLATES || [];
-    if (!templates.length) return shuffle(window.TEST_QUESTIONS || []);
-    var t = templates[Math.floor(Math.random() * templates.length)];
-    var byGroup = {};
-    (window.TEST_QUESTIONS || []).forEach(function (q) {
-      (byGroup[q.group] = byGroup[q.group] || []).push(q);
-    });
-    var picked = [];
-    Object.keys(t.pick || {}).forEach(function (g) {
-      var pool = byGroup[g] || [];
-      var mustSet = {};
-      (t.must || []).forEach(function (id) {
-        if (pool.some(function (q) { return q.id === id; })) mustSet[id] = true;
-      });
-      var mustQs = pool.filter(function (q) { return mustSet[q.id]; });
-      var rest = shuffle(pool.filter(function (q) { return !mustSet[q.id]; }));
-      var need = Math.max(0, (t.pick[g] || 0) - mustQs.length);
-      picked = picked.concat(mustQs, rest.slice(0, need));
-    });
-    return shuffle(picked);
+    return shuffle((window.TEST_QUESTIONS || []).slice());
   }
 
   // ---------- 答题渲染 ----------
@@ -203,16 +185,11 @@
       prefs[d.key] = { weight: w, want: want, raw: raw };
     });
 
-    // 兜底：若所有维度权重都为 0，取 |raw| 最大的两个维度设为「纳入考虑」
-    var anyActive = DIMS.some(function (d) { return prefs[d.key].weight > 0; });
-    if (!anyActive) {
-      var sorted = DIMS.slice().sort(function (a, b) {
-        return Math.abs(prefs[b.key].raw) - Math.abs(prefs[a.key].raw);
-      });
-      sorted.slice(0, 2).forEach(function (d) { prefs[d.key].weight = 1; });
-    }
+    // 统计「有明确倾向」的维度数（不再兜底强行凑维度）
+    var activeCount = 0;
+    DIMS.forEach(function (d) { if (prefs[d.key].weight > 0) activeCount++; });
 
-    return { prefs: prefs, inconsistent: inconsistent };
+    return { prefs: prefs, inconsistent: inconsistent, activeCount: activeCount };
   }
 
   function scoreCity(city, prefs) {
@@ -231,7 +208,15 @@
   function computeResults() {
     var cp = computePrefs();
     var data = window.CITY_DATA || [];
-    var scored = data.map(function (c) {
+
+    // 有 tag 偏好时，只考虑至少命中 1 个 tag 的城市
+    var pool = data;
+    if (collectedTags.length) {
+      var tagged = data.filter(function (c) { return hasAny(cityAllTags(c), collectedTags); });
+      if (tagged.length) pool = tagged;
+    }
+
+    var scored = pool.map(function (c) {
       var s = scoreCity(c, cp.prefs);
       var tagHit = collectedTags.length && hasAny(cityAllTags(c), collectedTags) ? 1 : 0;
       return { city: c, score: s.score, detail: s.detail, tagHit: tagHit };
@@ -251,6 +236,15 @@
     $("test-view").hidden = true;
     $("result-view").hidden = false;
     $("result-body").innerHTML = "";
+
+    // 维度不足 3 个：不给推荐结果，只提示不准确
+    var minDims = (window.TEST_META && window.TEST_META.minActiveDims) || 3;
+    if (r.cp.activeCount < minDims) {
+      $("result-body").appendChild(buildInaccurate(r, minDims));
+      scrollTop();
+      return;
+    }
+
     if (!r.scored.length) {
       $("result-body").innerHTML = '<div class="empty">这次没有算出匹配城市，再测一次试试吧。</div>';
       scrollTop();
@@ -260,6 +254,39 @@
     // 图必须在插入文档后初始化，否则容器宽度为 0
     setTimeout(initRadarChart, 0);
     scrollTop();
+  }
+
+  // 维度不足时的提示页（不展示任何城市结果）
+  function buildInaccurate(r, minDims) {
+    var wrap = document.createElement("div");
+    wrap.className = "result-inaccurate";
+    wrap.innerHTML =
+      '<div class="result-inaccurate-icon">✦</div>' +
+      '<h2 class="result-inaccurate-title">这次的结果可能不太准确</h2>' +
+      '<p class="result-inaccurate-text">' +
+        '你在 ' + r.cp.activeCount + ' 个维度上给出了明确倾向，' +
+        '至少要 ' + minDims + ' 个维度才能给出可靠的推荐。' +
+      '</p>' +
+      '<p class="result-inaccurate-text">' +
+        '可以重新测一次，按第一反应选，别太犹豫。' +
+      '</p>' +
+      '<div class="result-actions"></div>';
+
+    var actions = wrap.querySelector(".result-actions");
+    var retake = document.createElement("button");
+    retake.type = "button";
+    retake.className = "test-btn-primary";
+    retake.textContent = "重新测一次";
+    retake.addEventListener("click", function () { location.href = location.pathname; });
+    actions.appendChild(retake);
+
+    var back = document.createElement("a");
+    back.className = "test-btn-ghost";
+    back.href = "index.html";
+    back.textContent = "回首页";
+    actions.appendChild(back);
+
+    return wrap;
   }
 
   function esc(s) {
@@ -324,19 +351,16 @@
       wrap.appendChild(inc);
     }
 
-    // ---- tag 总结 ----
+    // ---- tag 总结（只展示命中的标签） ----
     if (collectedTags.length) {
       var tagBox = document.createElement("div");
       tagBox.className = "result-tag-summary";
-      var hitTags = collectedTags.filter(function (t) { return cityAllTags(best.city).indexOf(t) !== -1; });
-      var missTags = collectedTags.filter(function (t) { return cityAllTags(best.city).indexOf(t) === -1; });
+      var cityTags = cityAllTags(best.city);
+      var hitTags = collectedTags.filter(function (t) { return cityTags.indexOf(t) !== -1; });
       tagBox.innerHTML =
         '<div class="result-tag-line">你更偏爱：' + collectedTags.map(esc).join("、") + '</div>' +
         (hitTags.length
           ? '<div class="result-tag-line hit">这座城市正好有：' + hitTags.map(esc).join("、") + '</div>'
-          : '') +
-        (missTags.length
-          ? '<div class="result-tag-line miss">它没有（但你更偏好的）：' + missTags.map(esc).join("、") + '</div>'
           : '');
       wrap.appendChild(tagBox);
     }
@@ -394,10 +418,22 @@
       r.scored.slice(1, 4).forEach(function (x) {
         var a = document.createElement("div");
         a.className = "result-alt-item";
+        a.setAttribute("role", "button");
+        a.tabIndex = 0;
         a.innerHTML =
           '<span class="result-alt-name">' + esc(x.city.name) + '</span>' +
           '<span class="result-alt-prov">' + esc(x.city.province || "") + '</span>' +
           '<span class="result-alt-score">' + Math.round(x.score) + '%</span>';
+        // 点击备选城市 -> 打开城市卡片
+        a.addEventListener("click", function () {
+          if (window.showCityPopover) window.showCityPopover(x.city.name);
+        });
+        a.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            if (window.showCityPopover) window.showCityPopover(x.city.name);
+          }
+        });
         altList.appendChild(a);
       });
       alt.appendChild(altList);

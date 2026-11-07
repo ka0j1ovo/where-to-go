@@ -1036,10 +1036,8 @@ function render() {
   // 只保留匹配度 > 60% 的城市，且最多展示 10 个
   var qualified = scored.filter(function (x) { return x.score != null && x.score > MIN_MATCH_SCORE; });
   var shown = qualified.slice(0, MAX_RESULT_CARDS);
-  var truncated = qualified.length > shown.length;
 
   summary.textContent = "共匹配 " + shown.length + " 座城市" +
-    (truncated ? "（仅显示匹配度最高的 " + shown.length + " 座）" : "") +
     (excludedCount ? " · 已排除 " + excludedCount + " 座" : "");
 
   results.innerHTML = "";

@@ -436,9 +436,11 @@
           province: best.city.province || "",
           score: best.score,
           dims: DIMS.map(function (d) {
+            var v = dimVal(d.get(best.city));
             return {
               name: window.scaleNameOf ? window.scaleNameOf(d.key, d.short) : d.short,
-              value: dimVal(d.get(best.city))
+              value: v,
+              ratio: v / 5
             };
           })
         };

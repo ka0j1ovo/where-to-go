@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // 分享图片生成：把测试结果画成一张可下载的卡片
 // 依赖：qrdata.js（window.SITE_QR_DATAURI / window.SITE_URL）
 // 用法：window.buildShareImage(payload, cb) -> cb(dataUrl)
@@ -20,12 +20,96 @@
     ctx.closePath();
   }
 
+  // ---------- 雷达图 ----------
+  function ratioOf(d) {
+    if (typeof d.ratio === "number") return Math.max(0, Math.min(1, d.ratio));
+    var v = d.value;
+    if (v == null) return 0;
+    return Math.max(0, Math.min(1, v > 5 ? v / 100 : v / 5));
+  }
+
+  function drawRadar(ctx, cx, cy, R, dims, labelSize) {
+    var n = dims ? dims.length : 0;
+    if (n < 3) return;
+    var ratios = dims.map(ratioOf);
+    var i, a;
+
+    // 网格环
+    ctx.lineWidth = 1;
+    [0.25, 0.5, 0.75, 1].forEach(function (k) {
+      ctx.strokeStyle = k === 1 ? "#DCE3EE" : "#EDF1F8";
+      ctx.beginPath();
+      for (var j = 0; j < n; j++) {
+        var ang = -Math.PI / 2 + j * 2 * Math.PI / n;
+        var x = cx + Math.cos(ang) * R * k;
+        var y = cy + Math.sin(ang) * R * k;
+        if (j === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.stroke();
+    });
+
+    // 轴线
+    ctx.strokeStyle = "#EDF1F8";
+    for (i = 0; i < n; i++) {
+      a = -Math.PI / 2 + i * 2 * Math.PI / n;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + Math.cos(a) * R, cy + Math.sin(a) * R);
+      ctx.stroke();
+    }
+
+    // 数据区域
+    ctx.beginPath();
+    for (i = 0; i < n; i++) {
+      a = -Math.PI / 2 + i * 2 * Math.PI / n;
+      var rr = R * ratios[i];
+      var px = cx + Math.cos(a) * rr;
+      var py = cy + Math.sin(a) * rr;
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.fillStyle = "rgba(0,113,227,.16)";
+    ctx.fill();
+    ctx.strokeStyle = "#0071E3";
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+
+    // 顶点
+    for (i = 0; i < n; i++) {
+      a = -Math.PI / 2 + i * 2 * Math.PI / n;
+      var vr = R * ratios[i];
+      ctx.beginPath();
+      ctx.arc(cx + Math.cos(a) * vr, cy + Math.sin(a) * vr, 4, 0, Math.PI * 2);
+      ctx.fillStyle = "#0071E3";
+      ctx.fill();
+    }
+
+    // 维度名
+    if (labelSize) {
+      ctx.fillStyle = "#8E8E93";
+      ctx.font = "500 " + labelSize + "px " + FONT;
+      ctx.textBaseline = "middle";
+      for (i = 0; i < n; i++) {
+        a = -Math.PI / 2 + i * 2 * Math.PI / n;
+        var lx = cx + Math.cos(a) * (R + 22);
+        var ly = cy + Math.sin(a) * (R + 22);
+        var c = Math.cos(a);
+        ctx.textAlign = c > 0.3 ? "left" : (c < -0.3 ? "right" : "center");
+        ctx.fillText(dims[i].name, lx, ly);
+      }
+      ctx.textAlign = "left";
+      ctx.textBaseline = "alphabetic";
+    }
+  }
+
   function draw(payload) {
     return new Promise(function (resolve) {
       var dims = payload.dims || [];
-      var rowH = 64;                                  // 行距（加大）
-      var top = 336;
-      var footerTop = top + dims.length * rowH + 24;  // 底部区域随内容下移
+      var radarCY = 462;                              // 雷达图中心
+      var rowH = 54;
+      var listTop = 604;
+      var footerTop = listTop + dims.length * rowH + 26;
       var h = footerTop + 224;                        // 画布高度随内容
       var scale = 2;
       var canvas = document.createElement("canvas");
@@ -92,10 +176,13 @@
       ctx.lineTo(W - PAD, 306);
       ctx.stroke();
 
+      // 雷达图
+      drawRadar(ctx, W / 2, radarCY, 100, dims, 20);
+
       // 维度列表
       ctx.textBaseline = "middle";
       dims.forEach(function (d, i) {
-        var y = top + i * rowH;
+        var y = listTop + i * rowH;
         // 名称
         ctx.fillStyle = "#4b5563";
         ctx.font = "500 21px " + FONT;
@@ -104,7 +191,7 @@
         ctx.textAlign = "right";
         ctx.fillStyle = "#0071e3";
         ctx.font = "700 24px " + FONT;
-        ctx.fillText(String(d.value), W - PAD - 104, y);
+        ctx.fillText(String(d.value), W - PAD - 124, y);
         ctx.textAlign = "left";
         // 5 格刻度条
         var segW = 16, segH = 20, gap = 6;
@@ -242,22 +329,28 @@
         ctx.lineTo(W - PAD, 302);
         ctx.stroke();
 
-        // 2-5 名
+        // 左侧：第一名的维度雷达
+        if (payload.dims && payload.dims.length >= 3) {
+          drawRadar(ctx, 186, 444, 92, payload.dims, 17);
+        }
+
+        // 右侧：2-5 名
+        var listX = payload.dims && payload.dims.length >= 3 ? 352 : PAD;
         var rows = cities.slice(1, 5);
         rows.forEach(function (c, i) {
-          var y = 356 + i * 64;
+          var y = 372 + i * 62;
           ctx.fillStyle = "#c7c7cc";
           ctx.font = "700 19px " + FONT;
-          ctx.fillText(String(i + 2), PAD, y);
+          ctx.fillText(String(i + 2), listX, y);
 
           ctx.fillStyle = "#1d1d1f";
           ctx.font = "600 23px " + FONT;
-          ctx.fillText(c.name, PAD + 34, y);
+          ctx.fillText(c.name, listX + 34, y);
           var nw = ctx.measureText(c.name).width;
 
           ctx.fillStyle = "#8e8e93";
           ctx.font = "400 17px " + FONT;
-          ctx.fillText(c.province || "", PAD + 34 + nw + 12, y);
+          ctx.fillText(c.province || "", listX + 34 + nw + 12, y);
 
           ctx.textAlign = "right";
           ctx.fillStyle = "#0071e3";

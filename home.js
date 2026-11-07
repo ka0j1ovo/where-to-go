@@ -129,8 +129,13 @@
           var row = document.createElement("button");
           row.type = "button";
           row.className = "search-row";
-          // 下拉只显示地名
-          row.innerHTML = '<span class="search-row-name">' + window.escHtml(c.name) + '</span>';
+          // 城市名（深色）+ 省份 / 标签（浅色小字）
+          row.innerHTML =
+            '<span class="search-row-name">' + window.escHtml(c.name) + '</span>' +
+            '<span class="search-row-prov">' + window.escHtml(c.province || "") + '</span>' +
+            '<span class="search-row-tags">' +
+              window.cityAllTags(c).slice(0, 3).map(window.escHtml).join(" · ") +
+            '</span>';
           row.addEventListener("click", function () { window.showCityPopover(c.name); });
           box.appendChild(row);
         });

@@ -1118,7 +1118,25 @@ render();
       count: lastShownCities.length,
       cities: lastShownCities.map(function (x) {
         return { name: x.city.name, province: x.city.province || "", score: x.score };
-      })
+      }),
+      dims: (function () {
+        var topItem = lastShownCities[0];
+        var out = [];
+        if (!topItem || !topItem.city) return out;
+        // 用第一名的 7 个维度实际取值画雷达，保证维度完整
+        DIMENSIONS.forEach(function (d) {
+          if (d.options || d.key === "fun") return;
+          var raw = d.get(topItem.city);
+          if (typeof raw !== "number" || !isFinite(raw)) return;
+          var v = Math.max(1, Math.min(5, Math.round(raw)));
+          out.push({
+            name: (window.scaleNameOf ? window.scaleNameOf(d.key, d.short) : d.short),
+            value: v,
+            ratio: v / 5
+          });
+        });
+        return out;
+      })()
     };
     btn.disabled = true;
     btn.textContent = "生成中…";
